@@ -1,25 +1,30 @@
-# Better Start Personalized — Prototype 1
+# Better Start Personalized — Prototype 2
 
-This safely combines the live Better Start Reader with the 90-second personalization experience.
+This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## What is connected
+## New in V2
 
-- `/` opens the live Reader.
-- `/make-it-yours` opens the quick, playful personalization flow.
-- **Open my edition** saves the choices privately in that browser and opens the real Reader.
-- The Reader identifies itself as the person’s edition and composes the wall with a target balance of 65% direct interests, 20% adjacent discoveries and 15% Better Start editorial surprises.
-- The established rage-free policy, duplicate protection, source spacing, seven-day memory, refresh rules, Tetris layout, mobile composition, Joy Bench, saving and branded sharing remain in force.
-- **Generic Reader** clears the active personal edition without deleting the person’s interview answers.
+- Seven specialist source packs:
+  - The Sporting Life
+  - Business, Ideas + Good Living
+  - Style + Fashion
+  - Books, History + Archives
+  - Movement + Wellbeing
+  - Making, Fixing + Growing
+  - Cars, Boats + Beautiful Machines
+- A person’s interview choices activate up to four relevant packs.
+- Specialist stories are labeled quietly inside the wall.
+- A compact strip beneath the masthead explains which editorial desks are contributing to the edition.
+- New interview choices cover projects, gardening, boats, sailing and history; deeper choices cover yoga and boatbuilding.
+- Generic Reader behavior is unchanged when no personal profile exists.
+- All established safety, deduplication, source-spacing, refresh, seven-day memory, layout, mobile, Save, Share and Joy Bench rules remain active.
 
-## Login-free test deployment
+## Login-free deployment
 
-This prototype does not need a database, login, environment variables or paid service. Each tester’s choices live only in their own browser on the Vercel address.
+1. Create a new GitHub repository named `better-start-personalized-2`.
+2. Upload the **contents** of this folder.
+3. In Vercel choose **Add New → Project** and import that repository.
+4. Leave the defaults unchanged and click **Deploy**.
+5. Share the main production `vercel.app` address.
 
-1. Create one new GitHub repository named `better-start-personalized`.
-2. Upload the **contents** of this folder to that repository.
-3. In Vercel, choose **Add New → Project**.
-4. Import `better-start-personalized`.
-5. Leave every setting at its default and click **Deploy**.
-6. Share the resulting `https://...vercel.app` address. It is public and login-free.
-
-Later, accounts and a database can make an edition follow a person across phones and computers. They are intentionally not required for this prototype.
+No login, database or environment variables are required for this test version. Each tester’s choices are stored privately in that browser.

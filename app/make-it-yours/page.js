@@ -11,7 +11,7 @@ const topics=[
   {id:"animals",label:"Animals",color:"yellow",size:"md",children:["Dogs","Cats","Wildlife","Animal rescue","Birds","Ocean life","Animal intelligence","Conservation"]},
   {id:"sports",label:"Sports",color:"rust",children:["NFL + fantasy football","Baseball","Basketball","Soccer","Tennis","College sports","Great sports stories","Sports history"]},
   {id:"photography",label:"Photography",color:"navy",size:"xl",children:["Documentary","Street photography","Film cameras","Landscape","Photo history","Portraits","Darkrooms","New photographers"]},
-  {id:"books",label:"Books + ideas",color:"brown",size:"lg",children:["Fiction","History","Essays","Biography","Poetry","Book design","Independent magazines","New releases"]},
+  {id:"books",label:"Books + ideas",color:"brown",size:"lg",children:["Fiction","History","Essays","Biography","Poetry","Book design","Independent magazines","Archives + museums"]},
   {id:"outdoors",label:"Nature + outdoors",color:"green",size:"xl",children:["Hiking","National parks","Gardens","Forests","Birding","Camping","Beautiful landscapes","Conservation"]},
   {id:"travel",label:"Travel",color:"orange",size:"md",children:["Day trips","Great cities","Train travel","Small towns","Road trips","Museums","Hotels","Places to eat"]},
   {id:"design",label:"Art + design",color:"blue",size:"lg",children:["Architecture","Graphic design","Fine art","Furniture","Museums","Typography","Craft","Creative studios"]},
@@ -21,12 +21,12 @@ const topics=[
   {id:"people",label:"Good people",color:"red",size:"md",children:["Human ingenuity","Kindness","Community projects","Creative lives","Big achievements","Small victories","Mentors","Unexpected friendships"]},
   {id:"technology",label:"Technology",color:"navy",children:["Apple","Audio gear","Cameras","Clean energy","Inventors","Robotics","Creative tools","Thoughtful AI"]},
   {id:"business",label:"Business + money",color:"green",children:["Markets","Entrepreneurship","Personal finance","Interesting companies","Real estate","Workplace ideas","Economic history","New inventions"]},
-  {id:"health",label:"Health + fitness",color:"red",children:["Fitness","Running","Cycling","Nutrition","Mental wellbeing","Healthy aging","Sports medicine","Everyday health"]},
+  {id:"health",label:"Health + fitness",color:"red",children:["Yoga","Fitness","Running","Cycling","Mobility","Nutrition","Healthy aging","Everyday health"]},
   {id:"home",label:"Home + garden",color:"yellow",children:["Interior design","Gardens","Renovation","Organization","House history","Small spaces","Plants","Useful home ideas"]},
   {id:"family",label:"Family",color:"orange",children:["Things to do together","Parenting ideas","Children’s books","Education","College","Family travel","Youth sports","Useful local resources"]},
   {id:"style",label:"Style + fashion",color:"blue",children:["Personal style","Sneakers","Menswear","Womenswear","Vintage clothing","Fashion history","Independent designers","Watches"]},
   {id:"gaming",label:"Gaming",color:"navy",children:["New games","Retro gaming","Game design","Nintendo","PlayStation","Xbox","PC gaming","Indie games"]},
-  {id:"cars",label:"Cars + transportation",color:"rust",children:["New cars","Classic cars","Electric vehicles","Automotive design","Motorcycles","Trains","Aviation","Road trips"]}
+  {id:"cars",label:"Cars, boats + transportation",color:"rust",children:["New cars","Classic cars","Automotive design","Motorcycles","Boats + sailing","Boatbuilding","Trains","Aviation"]}
 ];
 const doorways=[
   {id:"music-on",label:"Music is usually playing",signals:["music"],color:"red",size:"xl"},
@@ -48,6 +48,10 @@ const doorways=[
   {id:"nearby",label:"I like knowing what’s happening nearby",signals:["local","food","family"],color:"rust",size:"lg"},
   {id:"animals",label:"Animals make almost everything better",signals:["animals","outdoors"],color:"yellow",size:"xl"},
   {id:"new",label:"I’ll happily learn about something completely new",signals:["science","people","books"],color:"red",size:"lg"}
+  ,{id:"projects",label:"I almost always have a project going",signals:["making","home"],color:"brown",size:"lg"}
+  ,{id:"garden",label:"I’m happiest in a garden",signals:["home","outdoors"],color:"green",size:"md"}
+  ,{id:"water",label:"I love boats and being on the water",signals:["cars","outdoors","travel"],color:"navy",size:"xl"}
+  ,{id:"history",label:"History sends me down rabbit holes",signals:["books","design"],color:"brown",size:"lg"}
 ];
 const specifics={
   "Hip-hop + rap":["New hip-hop","Golden age hip-hop","Beat-making","Independent rap","Live performances","Hip-hop history"],"Pop":["New pop","Live performances","Songwriting","Pop history","Great producers"],"Rock":["Classic rock","Indie rock","Live archives","New releases","Rock history"],"R&B + soul":["Classic soul","New R&B","Motown","Live sessions","Great vocalists"],"Jazz":["Alice Coltrane","Bill Frisell","Blue Note","Hard bop","ECM","Spiritual jazz"],"Country":["Classic country","Americana","New country","Songwriters","Live sessions"],"Classical":["Solo piano","20th-century composers","Chamber music","Orchestras","New recordings"],"Electronic":["Ambient","Synthesizers","Dance music","Experimental electronic","Studio craft"],
@@ -69,6 +73,11 @@ const specifics={
   "New games":["Reviews","Upcoming releases","Game studios","Beautiful games"],"Retro gaming":["Classic consoles","Arcades","Game history","Restorations"],"Game design":["How games are made","Visual design","Music + sound","Independent studios"],
   "Personal style":["Everyday style","Great basics","Independent brands","Style history"],"Sneakers":["New releases","Sneaker design","Classic models","Independent shops"],"Watches":["Watch design","Vintage watches","Independent makers","How watches work"],
   "Classic cars":["Automotive history","Beautiful restorations","Design icons","Great road stories"],"Automotive design":["Concept cars","Design history","Interiors","How cars are made"],"Trains":["Rail journeys","Train design","Historic railways","Great stations"]
+  ,"Boats + sailing":["Sailboats","Cruising stories","Maritime history","Beautiful harbors","Sailing craft"]
+  ,"Boatbuilding":["Wooden boats","Restorations","Working boatyards","Marine design"]
+  ,"Yoga":["Yoga practice","Mobility","Breathwork","Yoga history","Teachers worth knowing"]
+  ,"History":["Social history","Design history","Archives","Archaeology","Local history","Museums"]
+  ,"Gardens":["Garden design","Native plants","Botanical gardens","Small gardens","Horticultural craft"]
 };
 const defaultSpecifics=label=>[`${label} stories`,`${label} discoveries`,`${label} history`,`${label} people`];
 const readerDefaults={design:"Established Better Start Reader layout on desktop and mobile",safety:"Established rage-free, politics-free and blocked-content policy",radio:"Ambient",feedback:"More like this, Less, Too political and Too depressing",memory:"No duplicate content and no repeats within seven days",connections:"Offer optional service connections only in context, after the person uses the relevant feature"};

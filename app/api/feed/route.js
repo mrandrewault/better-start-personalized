@@ -37,12 +37,22 @@ function isDisallowed(item) {
   const value = policyText(`${item.title || ""} ${item.summary || ""} ${item.contentSnippet || ""} ${item.source || ""} ${item.section || ""}`);
   return blockedTerms.some(term => value.includes(policyText(term)));
 }
+function hasBadMood(value) {
+  return /killed|deadly|fatal|crash|unsafe|controvers|war|attack|crisis|disaster|outrage|scandal|cancer|dies?\b|death|threat|fear|horrific|tariffs?|banned|terrible|abuse|neglect|euthan|injur|defeat|worsen|\bworst\b/i.test(value);
+}
 function isJoyful(item) {
   const value = `${item.title || ""} ${item.summary || ""}`;
-  return /discover|new|beautiful|guide|best|love|return|release|photo|album|art|music|food|travel|space|nature|design|book|film|restor|celebrat|rescue|record|garden|recipe|festival|museum|wins?\b|victory|comeback|advance|adopt|reunited|kindness|community|uplifting|inspir|opens?|achievement|breakthrough|volunteer|conservation|recovery|success|helps?|creates?|invent/i.test(value) && !/killed|deadly|fatal|crash|unsafe|controvers|war|attack|crisis|disaster|outrage|scandal|cancer|dies?\b|death|threat|fear|horrific|tariffs?|banned|terrible|abuse|neglect|euthan|injur|defeat|worsen|\bworst\b/i.test(value);
+  return /discover|new|beautiful|guide|best|love|return|release|photo|album|art|music|food|travel|space|nature|design|book|film|restor|celebrat|rescue|record|garden|recipe|festival|museum|wins?\b|victory|comeback|advance|adopt|reunited|kindness|community|uplifting|inspir|opens?|achievement|breakthrough|volunteer|conservation|recovery|success|helps?|creates?|invent/i.test(value) && !hasBadMood(value);
+}
+function isSpecialistWorthwhile(item) {
+  const value = `${item.title || ""} ${item.summary || ""}`;
+  return /profile|interview|explainer|guide|design|history|archive|craft|studio|maker|founder|company|business|market|finance|style|fashion|collection|book|author|library|museum|yoga|movement|fitness|garden|plant|workshop|repair|restor|car|automotive|boat|sail|maritime|train|aviation|team|player|baseball|tennis|football|soccer/i.test(value) && !hasBadMood(value);
 }
 function isFreshLocal(item) {
   if (!item.date) return true;
+  // Specialist magazines are often valuable well beyond the daily-news cycle.
+  // Their evergreen craft, history and enthusiast pieces get a longer shelf.
+  if (item.sourcePack) return (Date.now() - new Date(item.date)) / 864e5 <= 400;
   const evergreenSources = new Set(["NPR Music", "Criterion", "NYT Arts", "NYT Books", "Guardian Science", "Guardian Culture", "Dezeen", "Eater", "NASA"]);
   if (evergreenSources.has(item.source)) return true;
   return (Date.now() - new Date(item.date)) / 864e5 <= 45;
@@ -146,6 +156,14 @@ function seededRandom(value = "better-start") {
   for (let index = 0; index < value.length; index++) state = Math.imul(state ^ value.charCodeAt(index), 16777619);
   return () => { state += 0x6D2B79F5; let result = state; result = Math.imul(result ^ result >>> 15, result | 1); result ^= result + Math.imul(result ^ result >>> 7, result | 61); return ((result ^ result >>> 14) >>> 0) / 4294967296; };
 }
+function activateSourcePacks(interests, packs) {
+  if (!interests.length) return [];
+  const words = new Set(interests.flatMap(value => String(value).toLowerCase().split(/\s+|\+|\//)).map(value => value.replace(/[^a-z0-9-]/g, "")).filter(value => value.length > 3));
+  return packs.map(pack => {
+    const hits = pack.signals.reduce((total, signal) => total + (interests.some(interest => interest.includes(signal) || signal.includes(interest)) || words.has(signal) ? 1 : 0), 0);
+    return {...pack, hits};
+  }).filter(pack => pack.hits > 0).sort((a, b) => b.hits - a.hits).slice(0, 4);
+}
 
 async function sharedVideoSources() {
   const fallback = load("video-sources.json"), url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL, token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
@@ -165,18 +183,18 @@ async function loadReaderVideos(avoid = new Set()) {
 
 export async function GET(request) {
   const params = new URL(request.url).searchParams, random = seededRandom(params.get("visit") || String(Math.floor(Date.now() / 72e5))), avoidVideos = new Set((params.get("avoid") || "").split(",").filter(Boolean)), localPlaces = (params.get("places") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 20), interests = (params.get("interests") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 48);
-  const taste = load("taste.json"), sources = load("sources.json");
+  const taste = load("taste.json"), baseSources = load("sources.json"), activePacks = activateSourcePacks(interests, load("source-packs.json")), specialistSources = activePacks.flatMap(pack => pack.sources.map(source => ({...source, pack:pack.id, packLabel:pack.label}))), sources = [...baseSources, ...specialistSources];
   const results = await Promise.allSettled(sources.map(async source => {
     const feed = await parser.parseURL(source.url);
     return (feed.items || []).slice(0, 40).map((item, index) => {
       const scored = score(item, source, taste);
-      const story = {title: plain(item.title) || "Untitled", url: item.link || "#", summary: plain(item.contentSnippet || item.content || ""), date: item.isoDate || item.pubDate || null, source: source.name, section: source.section, image: imageFor(item), ...scored};
+      const story = {title: plain(item.title) || "Untitled", url: item.link || "#", summary: plain(item.contentSnippet || item.content || ""), date: item.isoDate || item.pubDate || null, source: source.name, section: source.section, image: imageFor(item), sourcePack:source.pack || null, sourcePackLabel:source.packLabel || null, ...scored, score:scored.score + (source.pack ? 18 : 0)};
       return {...story, geoClass: classifyGeography(story, localPlaces), format: formatFor(story, index)};
     });
   }));
   let all = [];
   results.forEach(result => { if (result.status === "fulfilled") all.push(...result.value); });
-  all = unique(all.filter(item => item.score > 18 && !isDisallowed(item) && isJoyful(item) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
+  all = unique(all.filter(item => item.score > 18 && !isDisallowed(item) && (isJoyful(item) || (item.sourcePack && isSpecialistWorthwhile(item))) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
 
   // One shared registry across every page region makes duplicates impossible.
   const usedUrls = new Set(), usedTitles = new Set();
@@ -216,5 +234,5 @@ export async function GET(request) {
   const serendipityPool = all.filter(item => item.noHits === 0 && !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   const serendipity = claim(compose(serendipityPool, 60, {}, random));
 
-  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, composition:{direct:65,adjacent:20,editorial:15}, tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, important, serendipity, sourceStatus: {total: sources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
+  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, composition:{direct:65,adjacent:20,editorial:15}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
 }

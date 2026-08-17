@@ -1,0 +1,85 @@
+[
+  {
+    "id":"sports",
+    "label":"The Sporting Life",
+    "signals":["sports","team","football","baseball","basketball","soccer","tennis","fantasy","fitness","running","cycling"],
+    "sources":[
+      {"name":"ESPN Features","url":"https://www.espn.com/espn/rss/news","section":"SPORTS + PLAY","quality":8},
+      {"name":"Baseball Culture","url":"https://news.google.com/rss/search?q=baseball+MLB+ballpark+history+community+inspiring+-politics+-betting&hl=en-US&gl=US&ceid=US:en","section":"BASEBALL","quality":9},
+      {"name":"Tennis Life","url":"https://news.google.com/rss/search?q=tennis+US+Open+player+comeback+community+inspiring+-politics+-betting&hl=en-US&gl=US&ceid=US:en","section":"TENNIS","quality":9},
+      {"name":"Beautiful Game","url":"https://news.google.com/rss/search?q=soccer+football+club+community+academy+inspiring+-politics+-betting&hl=en-US&gl=US&ceid=US:en","section":"SPORTS + PLAY","quality":8},
+      {"name":"Sports History","url":"https://news.google.com/rss/search?q=sports+history+archive+anniversary+museum+legend+-politics&hl=en-US&gl=US&ceid=US:en","section":"SPORTS HISTORY","quality":8}
+    ]
+  },
+  {
+    "id":"business-culture",
+    "label":"Business, Ideas + Good Living",
+    "signals":["business","money","markets","finance","company","entrepreneur","real estate","hospitality","aviation","urbanism"],
+    "sources":[
+      {"name":"Monocle Business + Culture","url":"https://news.google.com/rss/search?q=site%3Amonocle.com+business+entrepreneurship+design+city+hospitality+-politics+-war&hl=en-US&gl=US&ceid=US:en","section":"BUSINESS + CULTURE","quality":10},
+      {"name":"Thoughtful Companies","url":"https://news.google.com/rss/search?q=company+profile+thoughtful+founder+craft+manufacturing+design+-politics&hl=en-US&gl=US&ceid=US:en","section":"BUSINESS + IDEAS","quality":9},
+      {"name":"Small Business Bright Spots","url":"https://news.google.com/rss/search?q=small+business+community+success+family+business+anniversary+-politics&hl=en-US&gl=US&ceid=US:en","section":"BUSINESS + PEOPLE","quality":9},
+      {"name":"Useful Money","url":"https://news.google.com/rss/search?q=personal+finance+useful+guide+saving+retirement+explainer+-politics+-crash&hl=en-US&gl=US&ceid=US:en","section":"MONEY + LIFE","quality":8},
+      {"name":"Better Cities","url":"https://news.google.com/rss/search?q=urbanism+public+space+main+street+revitalization+design+opens+-politics&hl=en-US&gl=US&ceid=US:en","section":"CITIES + DESIGN","quality":9}
+    ]
+  },
+  {
+    "id":"fashion-style",
+    "label":"Style + Fashion",
+    "signals":["fashion","style","sneakers","menswear","womenswear","vintage clothing","watch","independent designers"],
+    "sources":[
+      {"name":"Vogue Runway","url":"https://news.google.com/rss/search?q=site%3Avogue.com%2Ffashion-shows+collection+designer+craft+-politics&hl=en-US&gl=US&ceid=US:en","section":"FASHION + STYLE","quality":9},
+      {"name":"Independent Style","url":"https://news.google.com/rss/search?q=independent+fashion+designer+studio+craft+collection+-politics&hl=en-US&gl=US&ceid=US:en","section":"FASHION + STYLE","quality":9},
+      {"name":"Menswear Details","url":"https://news.google.com/rss/search?q=menswear+tailoring+workwear+style+history+craft+-politics&hl=en-US&gl=US&ceid=US:en","section":"STYLE + CRAFT","quality":8},
+      {"name":"Sneaker Design","url":"https://news.google.com/rss/search?q=sneaker+design+archive+collaboration+new+release+-politics&hl=en-US&gl=US&ceid=US:en","section":"STYLE + DESIGN","quality":8},
+      {"name":"Watchmakers","url":"https://news.google.com/rss/search?q=watchmaking+independent+watchmaker+design+craft+new+-politics&hl=en-US&gl=US&ceid=US:en","section":"STYLE + CRAFT","quality":8}
+    ]
+  },
+  {
+    "id":"books-history",
+    "label":"Books, History + Archives",
+    "signals":["books","read","fiction","history","essays","biography","poetry","magazine","museum","archive","archaeology"],
+    "sources":[
+      {"name":"Literary Hub","url":"https://lithub.com/feed/","section":"BOOKS + IDEAS","quality":9},
+      {"name":"JSTOR Daily","url":"https://daily.jstor.org/feed/","section":"HISTORY + IDEAS","quality":9},
+      {"name":"Smithsonian Stories","url":"https://news.google.com/rss/search?q=site%3Asmithsonianmag.com+history+discovery+archive+museum+-politics+-war&hl=en-US&gl=US&ceid=US:en","section":"HISTORY + WONDER","quality":9},
+      {"name":"Independent Bookshops","url":"https://news.google.com/rss/search?q=independent+bookstore+opens+community+author+festival+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOOKS + COMMUNITY","quality":9},
+      {"name":"Beautiful Archives","url":"https://news.google.com/rss/search?q=archive+restored+digitized+collection+library+discovery+-politics+-war&hl=en-US&gl=US&ceid=US:en","section":"HISTORY + WONDER","quality":8}
+    ]
+  },
+  {
+    "id":"wellbeing",
+    "label":"Movement + Wellbeing",
+    "signals":["yoga","wellbeing","health","fitness","running","cycling","mobility","nutrition","healthy aging","active"],
+    "sources":[
+      {"name":"Yoga Practice","url":"https://news.google.com/rss/search?q=site%3Ayogajournal.com+yoga+practice+mobility+wellbeing+-politics&hl=en-US&gl=US&ceid=US:en","section":"MOVEMENT + WELLBEING","quality":9},
+      {"name":"Movement Science","url":"https://news.google.com/rss/search?q=movement+mobility+exercise+research+benefits+healthy+aging+-politics&hl=en-US&gl=US&ceid=US:en","section":"FITNESS + WELLBEING","quality":9},
+      {"name":"Running Joy","url":"https://news.google.com/rss/search?q=running+community+inspiring+trail+runner+achievement+-politics&hl=en-US&gl=US&ceid=US:en","section":"MOVEMENT + PEOPLE","quality":8},
+      {"name":"Everyday Strength","url":"https://news.google.com/rss/search?q=strength+balance+mobility+useful+guide+research+-politics&hl=en-US&gl=US&ceid=US:en","section":"FITNESS + WELLBEING","quality":8}
+    ]
+  },
+  {
+    "id":"making-garden",
+    "label":"Making, Fixing + Growing",
+    "signals":["making","fixing","woodworking","ceramics","repair","tools","home","garden","plants","diy","craft"],
+    "sources":[
+      {"name":"MAKE","url":"https://makezine.com/feed/","section":"MAKING + DIY","quality":9},
+      {"name":"Gardenista","url":"https://www.gardenista.com/feed/","section":"GARDENS + DESIGN","quality":9},
+      {"name":"Workshop Stories","url":"https://news.google.com/rss/search?q=woodworking+workshop+craftsperson+restoration+beautiful+project+-politics&hl=en-US&gl=US&ceid=US:en","section":"MAKING + CRAFT","quality":9},
+      {"name":"Repair Is Beautiful","url":"https://news.google.com/rss/search?q=repair+restoration+reuse+workshop+community+craft+-politics&hl=en-US&gl=US&ceid=US:en","section":"MAKING + CRAFT","quality":8},
+      {"name":"Garden Discoveries","url":"https://news.google.com/rss/search?q=garden+horticulture+botanical+native+plants+opens+beautiful+-politics&hl=en-US&gl=US&ceid=US:en","section":"GARDENS + NATURE","quality":9}
+    ]
+  },
+  {
+    "id":"cars-boats",
+    "label":"Cars, Boats + Beautiful Machines",
+    "signals":["cars","automotive","motorcycles","boat","boats","sailing","yacht","maritime","transportation","trains","aviation"],
+    "sources":[
+      {"name":"Hagerty Culture","url":"https://news.google.com/rss/search?q=site%3Ahagerty.com+classic+car+restoration+design+history+-crash+-politics&hl=en-US&gl=US&ceid=US:en","section":"CARS + CULTURE","quality":9},
+      {"name":"Automotive Design","url":"https://news.google.com/rss/search?q=automotive+design+concept+car+restoration+classic+beautiful+-crash+-politics&hl=en-US&gl=US&ceid=US:en","section":"CARS + DESIGN","quality":9},
+      {"name":"Sailing Life","url":"https://news.google.com/rss/search?q=sailing+sailboat+cruising+restoration+maritime+beautiful+-politics&hl=en-US&gl=US&ceid=US:en","section":"SAILING + WATER","quality":9},
+      {"name":"Boatbuilding Craft","url":"https://news.google.com/rss/search?q=boatbuilding+wooden+boat+restoration+craft+launch+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOATS + CRAFT","quality":9},
+      {"name":"Rail + Aviation","url":"https://news.google.com/rss/search?q=train+aviation+design+history+restoration+museum+-politics+-crash&hl=en-US&gl=US&ceid=US:en","section":"TRANSPORT + DESIGN","quality":8}
+    ]
+  }
+]
