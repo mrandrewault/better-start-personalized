@@ -1,8 +1,15 @@
-# Better Start Personalized — V3
+# Better Start Personalized — V4
 
 This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## New in V3
+## New in V4
+
+- Fashion-literate prompts covering Fashion Week, Bergdorf’s, Le Bon Marché, runway collecting and production design.
+- Deep choices for fashion insiders, independent press, boutique labels, vintage runway, department stores and emerging designers.
+- A broad women-writers shelf rather than a single author standing in for the category.
+- New editorial inputs from The Gentlewoman, AnOther, System, Acne Paper, Vestoj, 1 Granary, SHOWstudio and other independent magazines.
+- Strong fashion/women’s profiles use an 80/12/8 direct/adjacent/surprise opening composition.
+- Unrelated generic videos cannot displace relevant fashion and women-centered stories in that mode.
 
 - Text-only stories receive intentional category-colored editorial art direction instead of looking like missing-image placeholders.
 - RSS image recovery now checks enclosures, media fields, lazy-loaded images and source sets before declaring a story text-only.
@@ -28,7 +35,7 @@ This version makes personal editions meaningfully different by expanding the act
 
 ## Login-free deployment
 
-1. Create a new GitHub repository named `better-start-personalized-3`.
+1. Create a new GitHub repository named `better-start-personalized-4`.
 2. Upload the **contents** of this folder.
 3. In Vercel choose **Add New → Project** and import that repository.
 4. Leave the defaults unchanged and click **Deploy**.

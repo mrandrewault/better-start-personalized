@@ -105,11 +105,11 @@ const adjacentSignals = {
 };
 function personalize(item, interests = []) {
   if (!interests.length) return {...item, personalFit:"editorial", personalHits:0};
-  const haystack = policyText(`${item.title} ${item.summary} ${item.source} ${item.section}`);
+  const haystack = policyText(`${item.title} ${item.summary} ${item.source} ${item.section} ${item.sourcePackLabel || ""}`);
   const stop = new Set(["things","stories","discoveries","ideas","together","especially","good"]);
   const roots = interests.flatMap(term => String(term).toLowerCase().split(/\s+|\+|\//)).map(word => word.replace(/[^a-z0-9-]/g,"" )).filter(word => word.length > 3 && !stop.has(word));
   const directTerms = [...new Set([...interests, ...roots])];
-  const direct = directTerms.filter(term => haystack.includes(policyText(term))).length;
+  const direct = directTerms.filter(term => haystack.includes(policyText(term))).length + Math.min(3, item.sourcePackHits || 0);
   const neighbors = [...new Set(roots.flatMap(root => adjacentSignals[root] || []))];
   const adjacent = neighbors.filter(term => haystack.includes(policyText(term))).length;
   return {...item, score:item.score + Math.min(42, direct * 11) + Math.min(18, adjacent * 4), personalFit:direct ? "direct" : adjacent ? "adjacent" : "editorial", personalHits:direct};
@@ -192,12 +192,12 @@ async function loadReaderVideos(avoid = new Set()) {
 
 export async function GET(request) {
   const params = new URL(request.url).searchParams, random = seededRandom(params.get("visit") || String(Math.floor(Date.now() / 72e5))), avoidVideos = new Set((params.get("avoid") || "").split(",").filter(Boolean)), localPlaces = (params.get("places") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 20), interests = (params.get("interests") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 48);
-  const taste = load("taste.json"), baseSources = load("sources.json"), activePacks = activateSourcePacks(interests, load("source-packs.json")), specialistSources = activePacks.flatMap(pack => pack.sources.map(source => ({...source, pack:pack.id, packLabel:pack.label}))), sources = [...baseSources, ...specialistSources];
+  const taste = load("taste.json"), baseSources = load("sources.json"), activePacks = activateSourcePacks(interests, load("source-packs.json")), specialistSources = activePacks.flatMap(pack => pack.sources.map(source => ({...source, pack:pack.id, packLabel:pack.label, packHits:pack.hits}))), sources = [...baseSources, ...specialistSources];
   const results = await Promise.allSettled(sources.map(async source => {
     const feed = await parser.parseURL(source.url);
     return (feed.items || []).slice(0, 40).map((item, index) => {
       const scored = score(item, source, taste);
-      const story = {title: plain(item.title) || "Untitled", url: item.link || "#", summary: plain(item.contentSnippet || item.content || ""), date: item.isoDate || item.pubDate || null, source: source.name, section: source.section, image: imageFor(item), sourcePack:source.pack || null, sourcePackLabel:source.packLabel || null, ...scored, score:scored.score + (source.pack ? 18 : 0)};
+      const story = {title: plain(item.title) || "Untitled", url: item.link || "#", summary: plain(item.contentSnippet || item.content || ""), date: item.isoDate || item.pubDate || null, source: source.name, section: source.section, image: imageFor(item), sourcePack:source.pack || null, sourcePackLabel:source.packLabel || null, sourcePackHits:source.packHits || 0, ...scored, score:scored.score + (source.pack ? 18 + Math.min(24, (source.packHits || 0) * 4) : 0)};
       return {...story, geoClass: classifyGeography(story, localPlaces), format: formatFor(story, index)};
     });
   }));
@@ -217,8 +217,14 @@ export async function GET(request) {
   const ribbonFavorite = tickerStories[0] || null;
   const favoriteSelection = claim(compose(brightPool.filter(item => !usedUrls.has(canonicalUrl(item.url))), 6, {}, random));
   const goodNews = claim(compose(all.filter(isGoodNews), 1, {}, random))[0] || null;
-  const videoPool = await loadReaderVideos(avoidVideos);
-  const media = claim(compose(videoPool, 20, {}, random));
+  const videoPool = (await loadReaderVideos(avoidVideos)).map(item => personalize(item, interests));
+  const fashionFocus = activePacks.some(pack => ["fashion-style","women-culture"].includes(pack.id) && pack.hits >= 2);
+  const focusMediaSignal = /fashion|runway|couture|designer|costume|wardrobe|atelier|supermodel|vogue|magazine|beauty|women|woman|female|wnba|tennis|pilates|yoga|wellness|author|novelist|book club/i;
+  const relevantMedia = videoPool.filter(item => item.personalFit !== "editorial" && (!fashionFocus || focusMediaSignal.test(`${item.title} ${item.summary} ${item.section}`)));
+  // A strongly signaled fashion/women's edition never gets padded with
+  // unrelated generic videos just because those thumbnails are available.
+  const mediaPool = fashionFocus ? relevantMedia : [...relevantMedia, ...videoPool.filter(item => item.personalFit === "editorial").slice(0, 5)];
+  const media = claim(compose(mediaPool, 20, {}, random));
   const importantPool = all.filter(item => ["NASA", "Guardian Science", "Science Breakthroughs", "Technology for Good", "Nature Restored"].includes(item.source));
   const important = claim(compose(importantPool, 3, {}, random));
   if (important.length < 3) {
@@ -228,14 +234,17 @@ export async function GET(request) {
   const galleryPool = all.filter(item => !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   let gallery;
   if (interests.length) {
-    const direct = compose(galleryPool.filter(item => item.personalFit === "direct"), 91, {}, random);
+    const focusIds = new Set(fashionFocus ? ["fashion-style","women-culture"] : activePacks.slice(0,2).map(pack => pack.id));
+    const focus = compose(galleryPool.filter(item => focusIds.has(item.sourcePack)), fashionFocus ? 78 : 45, {}, random);
+    const focusKeys = new Set(focus.map(item => canonicalUrl(item.url)));
+    const direct = compose(galleryPool.filter(item => item.personalFit === "direct" && !focusKeys.has(canonicalUrl(item.url))), fashionFocus ? 34 : 65, {}, random);
     const directKeys = new Set(direct.map(item => canonicalUrl(item.url)));
-    const adjacent = compose(galleryPool.filter(item => item.personalFit === "adjacent" && !directKeys.has(canonicalUrl(item.url))), 28, {}, random);
-    const selectedKeys = new Set([...direct, ...adjacent].map(item => canonicalUrl(item.url)));
-    const editorial = compose(galleryPool.filter(item => !selectedKeys.has(canonicalUrl(item.url))), 21, {}, random);
+    const adjacent = compose(galleryPool.filter(item => item.personalFit === "adjacent" && !focusKeys.has(canonicalUrl(item.url)) && !directKeys.has(canonicalUrl(item.url))), fashionFocus ? 17 : 28, {}, random);
+    const selectedKeys = new Set([...focus, ...direct, ...adjacent].map(item => canonicalUrl(item.url)));
+    const editorial = compose(galleryPool.filter(item => !selectedKeys.has(canonicalUrl(item.url))), fashionFocus ? 11 : 21, {}, random);
     const personalizedPool = [];
-    while (direct.length || adjacent.length || editorial.length) {
-      personalizedPool.push(...direct.splice(0, 13), ...adjacent.splice(0, 4), ...editorial.splice(0, 3));
+    while (focus.length || direct.length || adjacent.length || editorial.length) {
+      personalizedPool.push(...focus.splice(0, fashionFocus ? 11 : 7), ...direct.splice(0, fashionFocus ? 5 : 8), ...adjacent.splice(0, 3), ...editorial.splice(0, fashionFocus ? 1 : 2));
     }
     const backfill = galleryPool.filter(item => !new Set(personalizedPool.map(story => canonicalUrl(story.url))).has(canonicalUrl(item.url)));
     gallery = claim([...personalizedPool, ...compose(backfill, 140 - personalizedPool.length, {}, random)].slice(0, 140));
@@ -243,5 +252,5 @@ export async function GET(request) {
   const serendipityPool = all.filter(item => item.noHits === 0 && !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   const serendipity = claim(compose(serendipityPool, 60, {}, random));
 
-  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, composition:{direct:65,adjacent:20,editorial:15}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
+  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, composition:fashionFocus?{direct:80,adjacent:12,editorial:8}:{direct:65,adjacent:20,editorial:15}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
 }

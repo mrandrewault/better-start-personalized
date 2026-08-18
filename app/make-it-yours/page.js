@@ -24,8 +24,8 @@ const topics=[
   {id:"health",label:"Health + fitness",color:"red",children:["Yoga","Pilates","Fitness","Women’s running","Running","Cycling","Mobility","Wellness retreats","Nutrition","Healthy aging","Everyday health"]},
   {id:"home",label:"Home + garden",color:"yellow",children:["Interior design","Gardens","Renovation","Organization","House history","Small spaces","Plants","Useful home ideas"]},
   {id:"family",label:"Family",color:"orange",children:["Things to do together","Parenting ideas","Children’s books","Education","College","Family travel","Youth sports","Useful local resources"]},
-  {id:"style",label:"Style + fashion",color:"blue",children:["Runway + couture","Costume design","International fashion","Womenswear","Fashion photography","Vintage clothing","1990s fashion","Beauty + cosmetics","Independent designers","Personal style","Menswear","Sneakers","Watches"]},
-  {id:"women",label:"Women + culture",color:"red",children:["Women leaders","Women writers","Women in the arts","Women’s sports","Women’s tennis","Women’s running","Pilates","Wellness retreats","Costume design","Fashion photography","Beauty + cosmetics"]},
+  {id:"style",label:"Style + fashion",color:"blue",children:["Fashion Week","Runway + couture","Fashion insiders","Independent fashion press","Costume design","International fashion","Boutique labels","Fashion photography","Vintage runway","1990s fashion","Department stores","Beauty + cosmetics","Emerging designers","Personal style"]},
+  {id:"women",label:"Women + culture",color:"red",children:["Women writers","Women leaders","Women in the arts","Women’s sports","Women’s tennis","Women’s running","Pilates","Wellness retreats","Costume design","Fashion photography","Book clubs + reading","Women founders"]},
   {id:"gaming",label:"Gaming",color:"navy",children:["New games","Retro gaming","Game design","Nintendo","PlayStation","Xbox","PC gaming","Indie games"]},
   {id:"cars",label:"Cars, boats + transportation",color:"rust",children:["New cars","Classic cars","Automotive design","Motorcycles","Boats + sailing","Boatbuilding","Trains","Aviation"]}
 ];
@@ -53,9 +53,16 @@ const doorways=[
   ,{id:"garden",label:"I’m happiest in a garden",signals:["home","outdoors"],color:"green",size:"md"}
   ,{id:"water",label:"I love boats and being on the water",signals:["cars","outdoors","travel"],color:"navy",size:"xl"}
   ,{id:"history",label:"History sends me down rabbit holes",signals:["books","design"],color:"brown",size:"lg"}
-  ,{id:"fashion",label:"I follow fashion beyond what’s in stores",signals:["style","women","photography","design"],color:"blue",size:"xl"}
-  ,{id:"women-stories",label:"I want more stories about remarkable women",signals:["women","books","sports","people"],color:"red",size:"lg"}
+  ,{id:"fashion",label:"I follow fashion beyond what’s in stores",signals:["style","women","photography"],color:"blue",size:"xl"}
+  ,{id:"women-stories",label:"I want more stories about remarkable women",signals:["women","books","people"],color:"red",size:"lg"}
   ,{id:"costumes",label:"I notice the costumes before the plot",signals:["style","film","women"],color:"yellow",size:"lg"}
+  ,{id:"fashion-week",label:"Fashion Week is my World Series",signals:["style","women","photography"],color:"red",size:"xl"}
+  ,{id:"bergdorfs",label:"Scatter my ashes at Bergdorf’s",signals:["style","women","travel"],color:"blue",size:"lg"}
+  ,{id:"bon-marche",label:"Le Bon Marché is my happy place",signals:["style","women","travel"],color:"yellow",size:"lg"}
+  ,{id:"runway-save",label:"I save runway looks",signals:["style","photography"],color:"blue",size:"md"}
+  ,{id:"magazine-photo",label:"I buy magazines for the photography",signals:["style","photography","books"],color:"brown",size:"lg"}
+  ,{id:"designer-not-trend",label:"I follow designers, not trends",signals:["style","women"],color:"red",size:"lg"}
+  ,{id:"costume-binge",label:"I’ll watch anything with excellent production design",signals:["style","film","design"],color:"navy",size:"xl"}
 ];
 const specifics={
   "Hip-hop + rap":["New hip-hop","Golden age hip-hop","Beat-making","Independent rap","Live performances","Hip-hop history"],"Pop":["New pop","Live performances","Songwriting","Pop history","Great producers"],"Rock":["Classic rock","Indie rock","Live archives","New releases","Rock history"],"R&B + soul":["Classic soul","New R&B","Motown","Live sessions","Great vocalists"],"Jazz":["Alice Coltrane","Bill Frisell","Blue Note","Hard bop","ECM","Spiritual jazz"],"Country":["Classic country","Americana","New country","Songwriters","Live sessions"],"Classical":["Solo piano","20th-century composers","Chamber music","Orchestras","New recordings"],"Electronic":["Ambient","Synthesizers","Dance music","Experimental electronic","Studio craft"],
@@ -95,8 +102,17 @@ const specifics={
   ,"Pilates":["Pilates practice","Studio design","Mobility","Teachers worth knowing","Movement history"]
   ,"Wellness retreats":["Destination wellness","Spa design","Restorative travel","Mindful movement","Beautiful settings"]
   ,"Women leaders":["Creative leaders","Women founders","Scientists","Designers","Cultural leaders"]
-  ,"Women writers":["Ann Patchett","Novelists","Essayists","Author interviews","Independent bookshops"]
+  ,"Women writers":["Elin Hilderbrand","Ann Patchett","Emily Henry","Taylor Jenkins Reid","Kristin Hannah","Brit Bennett","Celeste Ng","Elizabeth Strout","Maggie O’Farrell","Tana French","Lauren Groff","Zadie Smith"]
   ,"Women in the arts":["Artists","Photographers","Architects","Curators","Major retrospectives"]
+  ,"Fashion Week":["Paris Fashion Week","Milan Fashion Week","Couture Week","Resort collections","Front-row reports","Street style"]
+  ,"Fashion insiders":["Miranda Priestly energy","Grace Coddington","André Leon Talley","Diana Vreeland","Isabella Blow","Bill Cunningham","Creative-director moves"]
+  ,"Independent fashion press":["The Gentlewoman","AnOther","System Magazine","Acne Paper","Vestoj","1 Granary","SHOWstudio","Purple Magazine"]
+  ,"Boutique labels":["The Row","Khaite","Toteme","Alaïa","Loewe","Dries Van Noten","Gabriela Hearst","Ulla Johnson"]
+  ,"Vintage runway":["Archive pulls","Vintage YSL","Vintage Halston","Phoebe Philo years","Lee McQueen","Runway archaeology"]
+  ,"Department stores":["Bergdorf Goodman","Le Bon Marché","Liberty London","La Rinascente","Fashion windows","Legendary buyers"]
+  ,"Emerging designers":["Fashion-school graduates","Central Saint Martins","Independent ateliers","Design competitions","Names to know"]
+  ,"Book clubs + reading":["Reese’s Book Club","Read with Jenna","Service95 Books","Independent booksellers","Beach reads","Literary fiction"]
+  ,"Women founders":["Fashion founders","Beauty founders","Creative entrepreneurs","Women-led companies","Independent studios"]
 };
 const defaultSpecifics=label=>[`${label} stories`,`${label} discoveries`,`${label} history`,`${label} people`];
 const readerDefaults={design:"Established Better Start Reader layout on desktop and mobile",safety:"Established rage-free, politics-free and blocked-content policy",radio:"Ambient",feedback:"More like this, Less, Too political and Too depressing",memory:"No duplicate content and no repeats within seven days",connections:"Offer optional service connections only in context, after the person uses the relevant feature"};
@@ -112,7 +128,8 @@ export default function MakeItYours(){
   useEffect(()=>{if(loaded)localStorage.setItem(STORAGE_KEY,JSON.stringify({step,doorwayPicks,neighborhoods,details,extra,name,updatedAt:new Date().toISOString()}))},[step,doorwayPicks,neighborhoods,details,extra,name,loaded]);
   useEffect(()=>{window.scrollTo({top:0,behavior:"smooth"})},[step]);
   const broad=useMemo(()=>[...new Set(doorways.filter(item=>doorwayPicks.includes(item.id)).flatMap(item=>item.signals))],[doorwayPicks]);
-  const chosenTopics=topics.filter(topic=>broad.includes(topic.id));
+  const fashionLed=doorwayPicks.some(id=>["fashion","women-stories","costumes","fashion-week","bergdorfs","bon-marche","runway-save","magazine-photo","designer-not-trend","costume-binge"].includes(id));
+  const chosenTopics=topics.filter(topic=>broad.includes(topic.id)).sort((a,b)=>fashionLed?(["style","women","photography","film","books","travel","design"].indexOf(a.id)+1||99)-(["style","women","photography","film","books","travel","design"].indexOf(b.id)+1||99):0);
   const neighborhoodOptions=useMemo(()=>{const perTopic=chosenTopics.length<=3?8:chosenTopics.length<=6?5:3,groups=chosenTopics.map(topic=>topic.children.slice(0,perTopic).map(label=>({label,parent:topic.label,color:topic.color,size:["Space","Jazz","Baseball","Architecture","Hiking","Restaurants","Street photography"].includes(label)?"lg":"md"})));return roundRobin(groups,50).filter((item,index,array)=>array.findIndex(other=>other.label===item.label)===index).slice(0,36)},[broad]);
   const detailOptions=useMemo(()=>{const perNeighborhood=neighborhoods.length<=4?6:neighborhoods.length<=8?4:2,groups=neighborhoods.map((label,index)=>(specifics[label]||defaultSpecifics(label)).slice(0,perNeighborhood).map(value=>({label:value,parent:label,color:topics[(index*3)%topics.length].color,size:index%4===0?"lg":index%5===0?"sm":"md"})));return roundRobin(groups,36).filter((item,index,array)=>array.findIndex(other=>other.label===item.label)===index)},[neighborhoods]);
   const profile=useMemo(()=>({version:2,name:name.trim(),title:name.trim()?`${name.trim()}’s Edition`:"My Edition",openingChoices:doorways.filter(item=>doorwayPicks.includes(item.id)).map(item=>item.label),broadInterests:chosenTopics.map(topic=>topic.label),specificInterests:neighborhoods,details,anythingElse:extra.split(/,|\n/).map(value=>value.trim()).filter(Boolean),readerDefaults}),[name,doorwayPicks,chosenTopics,neighborhoods,details,extra]);
@@ -130,6 +147,6 @@ export default function MakeItYours(){
     {step===2&&<section className="screen"><StepHeader eyebrow="ONE LAST PASS" title="Anything here feel especially you?" copy="Pick any names or ideas you especially like."/><div className={`constellation details ${details.length?"hasSelection":""}`}>{detailOptions.map((item,index)=><Bubble key={`${item.parent}-${item.label}`} {...item} depth={2} index={index} selected={details.includes(item.label)} onClick={()=>setDetails(toggle(details,item.label))}/>)}</div><div className="optional"><label><span>Anything we missed? <i>Optional</i></span><input value={extra} onChange={event=>setExtra(event.target.value)} placeholder="Toss in a person, place, hobby, team, food, website—anything."/></label></div></section>}
     {step===3&&<section className="screen finish"><StepHeader eyebrow="THAT’S PLENTY TO BEGIN" title="Your edition is ready." copy="Better Start can learn the rest while you enjoy it."/><div className="profile"><div className="profileName"><span>Name your edition <i>Optional</i></span><input value={name} onChange={event=>setName(event.target.value)} placeholder="Your first name"/><h2>{profile.title}</h2></div><div className="profileCloud">{[...profile.broadInterests,...neighborhoods,...details,...profile.anythingElse].slice(0,22).map((item,index)=><span className={`p-${index%5}`} key={`${item}-${index}`}>{item}</span>)}</div><div className="promise"><b>Already taken care of</b><p>The playful Reader design, mobile layout, ambient radio, rage-free editorial rules, source variety, duplicate protection and seven-day memory are all built in. You can teach it more with <em>More like this</em> and <em>Less</em> while you browse.</p></div></div></section>}
     <nav><button disabled={step===0} onClick={()=>setStep(value=>Math.max(0,value-1))}>← Back</button>{step<2&&<button className="primary" disabled={step===0?!doorwayPicks.length:!neighborhoods.length} onClick={next}>{step===0?"Get a little more specific":"One last pass"}<span>→</span></button>}{step===2&&<button className="primary" onClick={next}>This feels like me <span>→</span></button>}{step===3&&<button className="primary" onClick={buildEdition}>Open my edition <span>→</span></button>}</nav>
-    <footer><span>No account connections. No setup homework.</span><span>Personalized V3 · Saved privately in this browser</span></footer>
+    <footer><span>No account connections. No setup homework.</span><span>Personalized V4 · Saved privately in this browser</span></footer>
   </main>
 }
