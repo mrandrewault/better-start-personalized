@@ -1,8 +1,17 @@
-# Better Start Personalized — V10
+# Better Start Personalized — V11
 
 This version makes photography and playable media a composition requirement rather than a ranking preference.
 
-## New in V10
+## New in V11
+
+- Adds a browser-side image quality gate: imagery must have a long edge of at least 900px, a short edge of at least 500px and at least 700,000 total pixels.
+- A broken or undersized image is never enlarged into a feature frame.
+- When possible, a rejected image causes the entire module to be replaced by a distinct, credited high-resolution visual-shelf feature; it is never used as unrelated decoration for the original story.
+- If no truthful visual replacement is available, the story becomes a deliberately compact text module.
+- YouTube previews now request their maximum-resolution artwork rather than the small default thumbnail.
+- Expands the licensed visual reserve so the opening wall has replacements ready before a low-resolution source image reaches the screen.
+
+## Carried forward from V10
 
 - Checks up to 72 relevant source pages for Open Graph/Twitter images when RSS omits them.
 - Redistributes available visuals so every ten-story cluster targets at least 50% honest imagery, video or interaction.

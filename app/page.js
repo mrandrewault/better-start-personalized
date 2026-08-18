@@ -1,7 +1,6 @@
 "use client";
 import {useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 
-const FALLBACK = "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=1400&q=80";
 const BATCH_SIZE = 25;
 const SERENDIPITY_BATCH_SIZE = 9;
 const EDITION_MS = 2 * 60 * 60 * 1000;
@@ -169,12 +168,20 @@ function JoyTile({item, index}) {
     {item.joyType === "doodle" && <PocketEtch variant={item.variant} />}
   </article>;
 }
-function Story({item, index, paletteIndex = index, palette, onRate, onSave, onShare, saved}) {
+function Story({item, fallbackItem, index, paletteIndex = index, palette, onRate, onSave, onShare, saved}) {
   const tileRef = useRef(null);
-  const type = item.format || "article";
+  const [imageRejected, setImageRejected] = useState(false);
   const [playing, setPlaying] = useState(false);
+  useEffect(() => { setImageRejected(false); setPlaying(false); }, [item.canonicalUrl]);
+  const replacement = imageRejected && fallbackItem ? fallbackItem : item;
+  const hasImage = !!replacement.image && !(imageRejected && !fallbackItem);
+  const type = replacement.format || "article";
   const playable = type === "video" || type === "bandcamp";
-  const playerUrl = type === "video" ? `https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&rel=0` : item.embedUrl;
+  const playerUrl = type === "video" ? `https://www.youtube-nocookie.com/embed/${replacement.videoId}?autoplay=1&rel=0` : replacement.embedUrl;
+  const inspectImage = event => {
+    const image = event.currentTarget, longEdge = Math.max(image.naturalWidth, image.naturalHeight), shortEdge = Math.min(image.naturalWidth, image.naturalHeight);
+    if (longEdge < 900 || shortEdge < 500 || image.naturalWidth * image.naturalHeight < 700000) setImageRejected(true);
+  };
   useLayoutEffect(() => {
     const tile = tileRef.current;
     const body = tile?.querySelector(".tileBody");
@@ -207,11 +214,11 @@ function Story({item, index, paletteIndex = index, palette, onRate, onSave, onSh
     requestAnimationFrame(fitContents);
     document.fonts?.ready.then(() => requestAnimationFrame(fitContents));
     return () => { observer.disconnect(); tile.querySelectorAll("img").forEach(image => image.removeEventListener("load", fitContents)); };
-  }, [item.canonicalUrl, playing]);
-  const inkStyle = !item.image && !playable ? mixedInk(paletteIndex, palette) : undefined;
-  return <article ref={tileRef} style={inkStyle} className={`tile tile-${type} tile-pattern-${index % 9} ${item.image ? "tile-has-image" : "tile-no-image tile-text-art tile-mixed-ink"} ${categoryClass(item.section)}`}>
-    {playable && playing ? <div className="inlinePlayer"><iframe src={playerUrl} title={item.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /></div> : item.image && (playable ? <button className="imageLink mediaTrigger" onClick={() => setPlaying(true)} aria-label={`Play ${item.title}`}><img src={item.image} alt="" onError={event => {event.currentTarget.src = FALLBACK;}} /><span className="play">▶</span></button> : <a className="imageLink" href={item.url} target="_blank" rel="noreferrer"><img src={item.image} alt="" onError={event => {event.currentTarget.src = FALLBACK;}} /></a>)}
-    <div className="tileBody"><div className="kicker"><span>{item.section}</span><span>{type === "bandcamp" ? "New release" : type === "video" ? "Saved find" : age(item.date)}</span></div><h3><a href={item.url} target="_blank" rel="noreferrer">{item.title}</a></h3>{item.summary && type !== "visual" && <p>{item.summary.slice(0, type === "feature" ? 280 : 170)}</p>}<div className="meta">{item.sourcePackLabel && <i>From {item.sourcePackLabel}</i>}{item.source}</div><Feedback item={item} onRate={onRate} onSave={onSave} onShare={onShare} saved={saved}/></div>
+  }, [replacement.canonicalUrl, playing]);
+  const inkStyle = !hasImage && !playable ? mixedInk(paletteIndex, palette) : undefined;
+  return <article ref={tileRef} style={inkStyle} className={`tile tile-${type} tile-pattern-${index % 9} ${hasImage ? "tile-has-image" : "tile-no-image tile-text-art tile-mixed-ink"} ${categoryClass(replacement.section)}`}>
+    {playable && playing ? <div className="inlinePlayer"><iframe src={playerUrl} title={replacement.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /></div> : hasImage && (playable ? <button className="imageLink mediaTrigger" onClick={() => setPlaying(true)} aria-label={`Play ${replacement.title}`}><img src={replacement.image} alt="" onLoad={inspectImage} onError={() => setImageRejected(true)} /><span className="play">▶</span></button> : <a className="imageLink" href={replacement.url} target="_blank" rel="noreferrer"><img src={replacement.image} alt="" onLoad={inspectImage} onError={() => setImageRejected(true)} /></a>)}
+    <div className="tileBody"><div className="kicker"><span>{replacement.section}</span><span>{type === "bandcamp" ? "New release" : type === "video" ? "Saved find" : age(replacement.date)}</span></div><h3><a href={replacement.url} target="_blank" rel="noreferrer">{replacement.title}</a></h3>{replacement.summary && type !== "visual" && <p>{replacement.summary.slice(0, type === "feature" ? 280 : 170)}</p>}<div className="meta">{replacement.sourcePackLabel && <i>From {replacement.sourcePackLabel}</i>}{replacement.source}</div><Feedback item={replacement} onRate={onRate} onSave={onSave} onShare={onShare} saved={saved}/></div>
   </article>;
 }
 
@@ -261,7 +268,7 @@ export default function Home() {
 
     <section className="favoritesSection"><div className="sectionHead"><div><span>A few especially nice things</span><h2>Bright Spots</h2></div><p>Kindness, ingenuity & excellent dogs</p></div><div className="favorites">{uniqueFavorites.map(item => <a className="favorite" href={item.url} target="_blank" rel="noreferrer" key={item.canonicalUrl}><span>{age(item.date)}</span><h3>{item.title}</h3><b>{item.source}</b></a>)}</div></section>
 
-    <section className="gallerySection"><div className="sectionHead wallHead"><div><span>Every good magazine on the table</span><h2>Good Stuff</h2></div><p>Chosen for joy, curiosity & variety</p></div>{visibleBatches.length ? visibleBatches.map((batch, batchIndex) => <div className="galleryBatch" key={batchIndex}>{Array.from({length: Math.ceil(batch.length / 10)}, (_, clusterIndex) => { const cluster = arrangeForFrames(batch.slice(clusterIndex * 10, (clusterIndex + 1) * 10)), variant = (batchIndex * 3 + clusterIndex) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => { const absoluteIndex = batchIndex * BATCH_SIZE + clusterIndex * 10 + index; return item.format === "joy" ? <JoyTile item={item} index={absoluteIndex} key={item.canonicalUrl} /> : <Story item={item} index={absoluteIndex} paletteIndex={absoluteIndex} palette={palette} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />; })}</div>; })}</div>) : <div className="loading"><span>Composing today&apos;s wall</span><i /><i /><i /></div>}
+    <section className="gallerySection"><div className="sectionHead wallHead"><div><span>Every good magazine on the table</span><h2>Good Stuff</h2></div><p>Chosen for joy, curiosity & variety</p></div>{visibleBatches.length ? visibleBatches.map((batch, batchIndex) => <div className="galleryBatch" key={batchIndex}>{Array.from({length: Math.ceil(batch.length / 10)}, (_, clusterIndex) => { const cluster = arrangeForFrames(batch.slice(clusterIndex * 10, (clusterIndex + 1) * 10)), variant = (batchIndex * 3 + clusterIndex) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => { const absoluteIndex = batchIndex * BATCH_SIZE + clusterIndex * 10 + index; return item.format === "joy" ? <JoyTile item={item} index={absoluteIndex} key={item.canonicalUrl} /> : <Story item={item} fallbackItem={data?.visualReserve?.[absoluteIndex]} index={absoluteIndex} paletteIndex={absoluteIndex} palette={palette} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />; })}</div>; })}</div>) : <div className="loading"><span>Composing today&apos;s wall</span><i /><i /><i /></div>}
       {batches * BATCH_SIZE < wall.length && <div className="loadWrap"><button className="loadBtn" onClick={() => setBatches(count => count + 1)}>Load 25 More Good Things<span>↓</span></button></div>}
     </section>
 
