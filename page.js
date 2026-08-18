@@ -12,7 +12,7 @@ export default function Home(){
  useEffect(()=>{const t=setInterval(()=>setNow(new Date()),60000);fetch("/api/feed").then(r=>r.json()).then(setData).catch(()=>{});fetch("/api/weather").then(r=>r.json()).then(setWeather).catch(()=>{});return()=>clearInterval(t)},[]);
  const greeting=now.getHours()<12?"GOOD MORNING":now.getHours()<17?"GOOD AFTERNOON":"GOOD EVENING";
  const date=now.toLocaleDateString(undefined,{weekday:"long",year:"numeric",month:"long",day:"numeric"});
- const rate=(item,action)=>{const a=JSON.parse(localStorage.getItem("upwardsFeedback")||"[]");a.push({url:item.url,title:item.title,source:item.source,action,ts:Date.now()});localStorage.setItem("upwardsFeedback",JSON.stringify(a.slice(-250)))};
+ const rate=(item,action)=>{const a=JSON.parse(localStorage.getItem("betterStartFeedback")||"[]");a.push({url:item.url,title:item.title,source:item.source,action,ts:Date.now()});localStorage.setItem("betterStartFeedback",JSON.stringify(a.slice(-250)))};
  const f=data?.forYou||[], hero=f[0], side=f.slice(1,4), flow=f.slice(4,more?18:10);
 
  return <main className="shell">

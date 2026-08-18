@@ -1,8 +1,8 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
 
-const STORAGE_KEY="upwardsQuickPicksV1";
-const PROFILE_KEY="upwardsPersonalProfileV1";
+const STORAGE_KEY="betterStartQuickPicksV1";
+const PROFILE_KEY="betterStartPersonalProfileV1";
 const topics=[
   {id:"music",label:"Music",color:"red",children:["Hip-hop + rap","Pop","Rock","R&B + soul","Jazz","Country","Classical","Electronic","Latin music","Indie","Live music","New releases"]},
   {id:"film",label:"Movies + TV",color:"blue",children:["New movies","Great television","Classic film","Documentaries","Comedy","International cinema","Animation","Film craft"]},
@@ -125,7 +125,7 @@ const specifics={
   ,"Giving with results":["Measurable impact","Long-term follow-up","Beneficiaries first","Quiet generosity","Responsible corporate giving"]
 };
 const defaultSpecifics=label=>[`${label} stories`,`${label} discoveries`,`${label} history`,`${label} people`];
-const readerDefaults={design:"Established Upwards Reader layout on desktop and mobile",safety:"Established rage-free, politics-free and blocked-content policy",radio:"Ambient",feedback:"More like this, Less, Too political and Too depressing",memory:"No duplicate content and no repeats within seven days",connections:"Offer optional service connections only in context, after the person uses the relevant feature"};
+const readerDefaults={design:"Established Upwards layout on desktop and mobile",safety:"Established rage-free, politics-free and blocked-content policy",radio:"Ambient",feedback:"More like this, Less, Too political and Too depressing",memory:"No duplicate content and no repeats within seven days",connections:"Offer optional service connections only in context, after the person uses the relevant feature"};
 const roundRobin=(groups,limit)=>{const result=[];for(let row=0;result.length<limit;row++){let added=false;groups.forEach(group=>{if(result.length<limit&&group[row]){result.push(group[row]);added=true}});if(!added)break}return result};
 
 function Bubble({label,selected,onClick,index,depth,size="md",color="blue"}){return <button type="button" className={`bubble size-${size} color-${color} ${selected?"selected":""} depth-${depth}`} style={{"--delay":`${(index%11)*-0.23}s`,"--tilt":`${(index%5)-2}deg`}} aria-pressed={selected} onClick={onClick}><span>{label}</span><i>{selected?"✓":"+"}</i></button>}

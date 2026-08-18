@@ -15,6 +15,19 @@ const policyText = value => ` ${String(value || "").toLowerCase().replace(/[^a-z
 function plain(value = "") {
   return value.replace(/<[^>]+>/g, " ").replace(/&\w+;/g, " ").replace(/\s+/g, " ").trim();
 }
+function isEnglishText(value = "") {
+  const text = plain(value);
+  if (!text) return true;
+  const letters = text.match(/\p{L}/gu) || [];
+  if (!letters.length) return true;
+  const englishScriptLetters = text.match(/[A-Za-z]/g) || [];
+  // English headlines can contain accented names, but should not be primarily
+  // written in Arabic, Cyrillic, CJK or another non-English script.
+  return englishScriptLetters.length / letters.length >= 0.7;
+}
+function isEnglishItem(item) {
+  return isEnglishText(item.title) && isEnglishText(item.summary || item.contentSnippet || "");
+}
 function normalizeTitle(value = "") {
   return plain(value).toLowerCase().replace(/\b(the|a|an|and|or|but|to|of|for|in|on|at|with|from)\b/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
 }
@@ -68,7 +81,7 @@ function detectEditorialIdentity(interests, activePacks) {
     const packHits = activePacks.reduce((total, pack) => total + (identity.packs.includes(pack.id) ? pack.hits : 0), 0);
     return {id, ...identity, score:signalHits * 3 + packHits * 2};
   }).filter(identity => identity.score > 0).sort((a, b) => b.score - a.score);
-  return ranked[0] || {id:"general", label:"Upwards Reader", references:[], accent:"classic", imageTarget:.52, score:0};
+  return ranked[0] || {id:"general", label:"Upwards", references:[], accent:"classic", imageTarget:.52, score:0};
 }
 function contextAllowed(item, identity) {
   const value = `${item.title || ""} ${item.summary || ""}`;
@@ -173,7 +186,7 @@ async function loadVisualShelf(identity, count = 80) {
         const title = plain(page.title?.replace(/^File:/i, "").replace(/\.[a-z0-9]+$/i, "").replace(/[_-]+/g, " "));
         const artist = plain(metadata.Artist?.value || metadata.Credit?.value || "Wikimedia Commons contributor").slice(0, 90);
         const license = plain(metadata.LicenseShortName?.value || metadata.UsageTerms?.value || "Open license").slice(0, 50);
-        if (!image || !/^image\/(jpeg|png|webp)$/i.test(info?.mime || "") || title.length < 5 || isDisallowed({title})) return;
+        if (!image || !/^image\/(jpeg|png|webp)$/i.test(info?.mime || "") || title.length < 5 || !isEnglishText(title) || isDisallowed({title})) return;
         results.push({title, url:`https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title.replace(/ /g, "_"))}`, summary:"", date:null, source:`${artist} · ${license}`, section:"VISUAL SHELF", image, score:95, interestHits:4, noHits:0, personalFit:"direct", format:"visual", sourcePack:"visual-shelf", sourcePackLabel:`${identity.label} visual shelf`, visualShelf:true});
       });
     } catch {}
@@ -310,7 +323,7 @@ async function loadReaderVideos(avoid = new Set()) {
     return (feed.items || []).slice(0, 12).map(item => { const videoId = item.id?.split(":").pop() || item.link?.match(/[?&]v=([^&]+)/)?.[1]; return {title:plain(item.title),url:item.link,summary:"",date:item.isoDate||item.pubDate||null,source:source.name,section:source.category === "music" ? "MUSIC" : source.category === "art" ? "ART + DESIGN" : source.category === "animals" ? "ANIMALS + JOY" : "PEOPLE + JOY",image:videoId?`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`:null,score:70,interestHits:3,noHits:0,videoId,format:"video"}; });
   }));
   const items=[]; results.forEach(result=>{if(result.status==="fulfilled")items.push(...result.value);});
-  return unique(items.filter(item=>item.videoId&&!avoid.has(item.videoId)&&!isDisallowed(item)));
+  return unique(items.filter(item=>item.videoId&&!avoid.has(item.videoId)&&isEnglishItem(item)&&!isDisallowed(item)));
 }
 
 export async function GET(request) {
@@ -326,7 +339,7 @@ export async function GET(request) {
   }));
   let all = [];
   results.forEach(result => { if (result.status === "fulfilled") all.push(...result.value); });
-  all = unique(all.filter(item => item.score > 18 && !isDisallowed(item) && contextAllowed(item, editorialIdentity) && (isJoyful(item) || (item.sourcePack && isSpecialistWorthwhile(item))) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
+  all = unique(all.filter(item => item.score > 18 && isEnglishItem(item) && !isDisallowed(item) && contextAllowed(item, editorialIdentity) && (isJoyful(item) || (item.sourcePack && isSpecialistWorthwhile(item))) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
   all = await enrichIdentityImages(all, editorialIdentity);
 
   // One shared registry across every page region makes duplicates impossible.
