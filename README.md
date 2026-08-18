@@ -1,13 +1,15 @@
-# Better Start Personalized — V6
+# Better Start Personalized — V7
 
 This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## New in V6
+## New in V7
 
 - A calmer four-pass taste interview: 12 broad opening choices, a tailored follow-up, subjects, then names and specifics.
 - A new Philanthropy + Community lane emphasizes beneficiaries, measurable results and money put to genuine public use.
 - Amazon and Jeff Bezos are blocked globally; MacKenzie Scott and constructive philanthropy remain welcome.
-- The first 20 Good Stuff stories target at least 60% genuine editorial imagery, without logos or generic thumbnails counting as pictures.
+- The first 20 Good Stuff stories target at least 60% genuine editorial imagery; fashion-led editions require 70%. Logos, gradients and colored text cards never count as pictures.
+- The first interview screen includes a direct **Fashion with a capital F** doorway.
+- Fashion text modules rotate through a controlled spectrum of saturated, tinted, deep and neutral colors instead of defaulting to monochrome or pink.
 - Weight-loss and body-anxiety filters now cover hyphenated wording and every visible page surface.
 
 ## Editorial identity foundation

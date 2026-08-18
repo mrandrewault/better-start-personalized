@@ -77,7 +77,10 @@ function contextAllowed(item, identity) {
   return true;
 }
 
-function visualFirst(items, identity, count = 20, target = 12) {
+function visualFirst(items, identity, count = 20, requestedTarget) {
+  // A color field is useful art direction, but it is not editorial imagery.
+  // Identity image targets therefore count only honest story images/video stills.
+  const target = requestedTarget ?? Math.ceil(count * Math.max(.6, identity.imageTarget || 0));
   const opening = items.slice(0, count), rest = items.slice(count);
   let visualCount = opening.filter(item => item.image).length;
   while (visualCount < target) {
@@ -316,7 +319,7 @@ export async function GET(request) {
       if (otherQueue.length && (opening.length > 18 || editorialIdentity.id !== "fashion")) opening.push(otherQueue.shift());
       if (!visualQueue.length && !textQueue.length) opening.push(...otherQueue.splice(0));
     }
-    gallery = claim(visualFirst(opening, editorialIdentity));
+    gallery = claim(visualFirst(opening, editorialIdentity, 20, fashionFocus ? 14 : undefined));
   } else gallery = claim(visualFirst(compose(galleryPool, 140, {}, random), editorialIdentity));
   const serendipityPool = all.filter(item => item.noHits === 0 && !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   const serendipity = claim(compose(serendipityPool, 60, {}, random));

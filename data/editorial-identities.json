@@ -5,7 +5,7 @@
     "signals": ["fashion", "runway", "couture", "style", "costume", "wardrobe", "designer", "supermodel", "vogue", "bergdorf", "bon marche", "women writers"],
     "references": ["System", "AnOther", "The Gentlewoman", "Kinfolk", "i-D", "Dazed", "Vogue Italia", "Document Journal", "Vestoj", "SHOWstudio", "1 Granary", "HommeGirls"],
     "accent": "cobalt",
-    "imageTarget": 0.68
+    "imageTarget": 0.7
   },
   "sports": {
     "label": "The Sporting Life",
