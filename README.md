@@ -1,8 +1,15 @@
-# Better Start Personalized — V8
+# Better Start Personalized — V9
 
 This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## New in V8
+## New in V9
+
+- Removes the interest/source-pack strip beneath the masthead.
+- Rotates through 24 coordinated, hand-picked four-color palettes on reload.
+- Keeps every text tile inside the current palette while generating unique tints and shades.
+- Extends the palette into Bright Spots, buttons, rules, joy cards and the consequential-news band.
+
+## Carried forward from V8
 
 - Text-card colors are assigned by one page-wide palette sequence rather than repeating inside every layout cluster.
 - No exact background swatch is reused in the loaded page; returning color families receive different hue, saturation and lightness values.

@@ -264,3 +264,19 @@
 .tile-mixed-ink:before,.tile-mixed-ink:after{display:none!important}
 .tile-mixed-ink h3,.tile-mixed-ink h3 a,.tile-mixed-ink .kicker,.tile-mixed-ink .kicker span,.tile-mixed-ink .meta,.tile-mixed-ink .meta i,.tile-mixed-ink p,.tile-mixed-ink .controls button{color:var(--tile-ink)!important}
 .tile-mixed-ink .kicker,.tile-mixed-ink .controls button{border-color:color-mix(in srgb,var(--tile-ink) 42%,transparent)!important}
+
+/* V9: one cohesive, Color Hunt-style palette per visit. */
+.shell{--palette-1:#c8dfdb;--palette-2:#eaeaea;--palette-3:#f5f5f5;--palette-4:#4a6b65}
+.shell .sectionHead span,.shell .importantIntro>span{color:var(--palette-4)}
+.shell .wallHead{border-color:var(--palette-4)}
+.shell .personalizeButton,.shell .loadBtn{background:var(--palette-4);border-color:var(--palette-4);color:#fff}
+.shell .loadBtn{box-shadow:5px 5px 0 var(--palette-1)}
+.shell .radioOn{background:var(--palette-4)}
+.shell .favorites .favorite:nth-child(4n+1){background:color-mix(in srgb,var(--palette-1) 76%,white)}
+.shell .favorites .favorite:nth-child(4n+2){background:color-mix(in srgb,var(--palette-2) 76%,white)}
+.shell .favorites .favorite:nth-child(4n+3){background:color-mix(in srgb,var(--palette-3) 76%,white)}
+.shell .favorites .favorite:nth-child(4n){background:color-mix(in srgb,var(--palette-4) 18%,white)}
+.shell .favorite b{color:color-mix(in srgb,var(--palette-4) 85%,#111)}
+.shell .important{background:color-mix(in srgb,var(--palette-4) 80%,#111);border-top-color:var(--palette-1)}
+.shell .questionBody{background:color-mix(in srgb,var(--palette-2) 72%,white)}
+.shell .revealButton{background:var(--palette-4)}
