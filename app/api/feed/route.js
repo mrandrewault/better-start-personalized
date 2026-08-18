@@ -110,11 +110,75 @@ async function enrichStoryImage(item) {
   } catch { return item; }
 }
 async function enrichIdentityImages(items, identity) {
-  if (identity.id === "general") return items;
-  const candidates = items.filter(item => !item.image && isIdentityStory(item, identity)).slice(0, 24);
+  // Image availability is a composition requirement, not a nice-to-have.
+  // Try the most relevant stories first, then adjacent/editorial stories. This
+  // keeps visual coverage high without attaching an unrelated photograph to a
+  // text story.
+  const candidates = items.filter(item => !item.image).sort((a, b) => {
+    const relevance = item => (isIdentityStory(item, identity) ? 3 : 0) + (item.personalFit === "direct" ? 2 : item.personalFit === "adjacent" ? 1 : 0);
+    return relevance(b) - relevance(a) || b.score - a.score;
+  }).slice(0, 72);
   if (!candidates.length) return items;
-  const enriched = await Promise.all(candidates.map(enrichStoryImage)), byUrl = new Map(enriched.map(item => [item.url, item]));
+  const enriched = [];
+  // Small batches avoid hammering publishers while still checking enough
+  // source pages to build a genuinely visual edition.
+  for (let index = 0; index < candidates.length; index += 12) {
+    enriched.push(...await Promise.all(candidates.slice(index, index + 12).map(enrichStoryImage)));
+  }
+  const byUrl = new Map(enriched.map(item => [item.url, item]));
   return items.map(item => byUrl.get(item.url) || item);
+}
+
+function distributeVisuals(items, identity, blockSize = 10) {
+  const arranged = [...items];
+  const targetFor = start => Math.min(
+    blockSize,
+    Math.ceil(Math.min(blockSize, arranged.length - start) * Math.max(.5, identity.imageTarget || 0))
+  );
+  for (let start = 0; start < arranged.length; start += blockSize) {
+    const end = Math.min(arranged.length, start + blockSize), target = targetFor(start);
+    let count = arranged.slice(start, end).filter(item => item.image).length;
+    while (count < target) {
+      const textIndex = arranged.slice(start, end).map((item, offset) => ({item, index:start + offset})).reverse().find(entry => !entry.item.image)?.index;
+      let visualIndex = arranged.findIndex((item, index) => index >= end && item.image && isIdentityStory(item, identity));
+      if (visualIndex < 0) visualIndex = arranged.findIndex((item, index) => index >= end && item.image);
+      if (textIndex === undefined || visualIndex < 0) break;
+      [arranged[textIndex], arranged[visualIndex]] = [arranged[visualIndex], arranged[textIndex]];
+      count++;
+    }
+  }
+  return arranged;
+}
+
+const visualSearches = {
+  fashion:["fashion editorial photography", "haute couture runway", "fashion week street style", "fashion portrait photography"],
+  outdoors:["mountain landscape photography", "wildlife photography", "hiking trail landscape", "forest nature photography"],
+  sports:["sports photography", "baseball photography", "tennis photography", "running athletics photography"],
+  business:["modern architecture photography", "craft workshop photography", "city design photography", "independent shop photography"],
+  food:["food photography", "restaurant interior photography", "bakery photography", "market food photography"],
+  culture:["museum art photography", "theatre performance photography", "bookshop photography", "artist studio photography"],
+  science:["astronomy photography", "microscopy photography", "natural history museum", "scientific instrument photography"],
+  general:["art photography", "beautiful nature photography", "architecture photography", "human interest photography"]
+};
+async function loadVisualShelf(identity, count = 56) {
+  const searches = visualSearches[identity.id] || visualSearches.general, results = [];
+  await Promise.all(searches.map(async search => {
+    try {
+      const params = new URLSearchParams({action:"query",generator:"search",gsrsearch:search,gsrnamespace:"6",gsrlimit:"20",prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"1400",format:"json",origin:"*"});
+      const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {headers:{"User-Agent":"BetterStart/10.0 (visual shelf; attributed Commons media)"}, signal:AbortSignal.timeout(5500)});
+      if (!response.ok) return;
+      const payload = await response.json();
+      Object.values(payload?.query?.pages || {}).forEach(page => {
+        const info = page.imageinfo?.[0], metadata = info?.extmetadata || {}, image = info?.thumburl || info?.url;
+        const title = plain(page.title?.replace(/^File:/i, "").replace(/\.[a-z0-9]+$/i, "").replace(/[_-]+/g, " "));
+        const artist = plain(metadata.Artist?.value || metadata.Credit?.value || "Wikimedia Commons contributor").slice(0, 90);
+        const license = plain(metadata.LicenseShortName?.value || metadata.UsageTerms?.value || "Open license").slice(0, 50);
+        if (!image || !/^image\/(jpeg|png|webp)$/i.test(info?.mime || "") || title.length < 5 || isDisallowed({title})) return;
+        results.push({title, url:`https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title.replace(/ /g, "_"))}`, summary:"", date:null, source:`${artist} · ${license}`, section:"VISUAL SHELF", image, score:95, interestHits:4, noHits:0, personalFit:"direct", format:"visual", sourcePack:"visual-shelf", sourcePackLabel:`${identity.label} visual shelf`, visualShelf:true});
+      });
+    } catch {}
+  }));
+  return unique(results).slice(0, count);
 }
 function isFreshLocal(item) {
   if (!item.date) return true;
@@ -319,8 +383,13 @@ export async function GET(request) {
       if (otherQueue.length && (opening.length > 18 || editorialIdentity.id !== "fashion")) opening.push(otherQueue.shift());
       if (!visualQueue.length && !textQueue.length) opening.push(...otherQueue.splice(0));
     }
-    gallery = claim(visualFirst(opening, editorialIdentity, 20, fashionFocus ? 14 : undefined));
-  } else gallery = claim(visualFirst(compose(galleryPool, 140, {}, random), editorialIdentity));
+    gallery = claim(distributeVisuals(visualFirst(opening, editorialIdentity, 20, fashionFocus ? 14 : undefined), editorialIdentity));
+  } else gallery = claim(distributeVisuals(visualFirst(compose(galleryPool, 140, {}, random), editorialIdentity), editorialIdentity));
+  // If publishers still do not supply enough images, insert attributed,
+  // openly licensed standalone photography. These are honest visual features,
+  // never unrelated decorations attached to another story.
+  const visualShelf = claim(await loadVisualShelf(editorialIdentity));
+  gallery = distributeVisuals([...gallery, ...visualShelf], editorialIdentity).slice(0, 140);
   const serendipityPool = all.filter(item => item.noHits === 0 && !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   const serendipity = claim(compose(serendipityPool, 60, {}, random));
 

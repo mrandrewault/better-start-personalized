@@ -1,15 +1,18 @@
-# Better Start Personalized — V9
+# Better Start Personalized — V10
 
-This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
+This version makes photography and playable media a composition requirement rather than a ranking preference.
 
-## New in V9
+## New in V10
 
-- Removes the interest/source-pack strip beneath the masthead.
-- Rotates through 24 coordinated, hand-picked four-color palettes on reload.
-- Keeps every text tile inside the current palette while generating unique tints and shades.
-- Extends the palette into Bright Spots, buttons, rules, joy cards and the consequential-news band.
+- Checks up to 72 relevant source pages for Open Graph/Twitter images when RSS omits them.
+- Redistributes available visuals so every ten-story cluster targets at least 50% honest imagery, video or interaction.
+- Raises media frequency from one per three stories to one per two while media is available.
+- Reserves large frames for visual/playable modules and keeps text-only stories compact.
+- Never attaches an unrelated photograph to a story merely to decorate its card.
+- Establishes the rule that edition-specific visual shelves must use licensed or explicitly displayable sources.
+- Adds edition-aware, attributed Wikimedia Commons visual shelves when publisher imagery runs out (fashion, outdoors, sports, business, food, culture, science and general discovery each use distinct searches).
 
-## Carried forward from V8
+## Carried forward from V9
 
 - Text-card colors are assigned by one page-wide palette sequence rather than repeating inside every layout cluster.
 - No exact background swatch is reused in the loaded page; returning color families receive different hue, saturation and lightness values.
