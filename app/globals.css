@@ -180,6 +180,35 @@
 .tetrisCluster .tile-no-image p{display:none}.tetrisCluster .tile-no-image h3{margin-block:8px}
 @media(max-width:650px){.hello{display:block;margin:28px 0 16px}.hello h1{font-size:clamp(52px,17vw,78px);white-space:normal}.helloAside{width:100%;margin-top:13px}.helloAside span{font-size:14px}.ribbon{margin-bottom:28px}.favorite{min-height:120px}.tetrisCluster .tile-no-image p{display:none}}
 
+/* V3: when a publisher supplies no honest image, typography becomes the art. */
+.cat-fashion-style,.cat-international-fashion,.cat-fashion-photography,.cat-fashion-history,.cat-italian-style,.cat-costume-screen{--accent:#8d3158}
+.cat-women-ideas,.cat-women-s-sports,.cat-women-s-tennis,.cat-women-arts{--accent:#a3295a}
+.cat-running-wellbeing,.cat-pilates-wellbeing{--accent:#236d68}
+.cat-beauty-craft{--accent:#a14972}
+.tile-text-art{isolation:isolate;background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 8%,#fffdf8),color-mix(in srgb,var(--accent) 22%,#f7f0e5));border-color:color-mix(in srgb,var(--accent) 34%,var(--line))}
+.tile-text-art:before,.tile-text-art:after{content:"";position:absolute;pointer-events:none;z-index:-1;opacity:.34}
+.tile-text-art:before{width:46%;aspect-ratio:1;border:1px solid color-mix(in srgb,var(--accent) 58%,transparent);border-radius:50%;right:-15%;top:-18%}
+.tile-text-art:after{inset:auto 0 0;height:9px;background:var(--accent)}
+.tile-text-art .tileBody{position:relative;z-index:1;background:transparent}
+.tile-text-art h3{max-width:96%;text-wrap:balance}
+.tile-text-art .kicker{border-bottom:1px solid color-mix(in srgb,var(--accent) 25%,transparent);padding-bottom:7px}
+.tile-text-art.tile-pattern-1{background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 13%,#fff8e9),#fff 57%,color-mix(in srgb,var(--accent) 25%,#f8eee1))}
+.tile-text-art.tile-pattern-1:before{border-radius:0;transform:rotate(35deg);right:-23%;top:-35%}
+.tile-text-art.tile-pattern-2{background:repeating-linear-gradient(115deg,color-mix(in srgb,var(--accent) 7%,#fff) 0 18px,color-mix(in srgb,var(--accent) 14%,#fff) 18px 19px)}
+.tile-text-art.tile-pattern-2:before{display:none}
+.tile-text-art.tile-pattern-3{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 28%,#fff1dc),color-mix(in srgb,var(--accent) 7%,#fff) 62%)}
+.tile-text-art.tile-pattern-3 h3{font-family:"DM Serif Display",serif;font-style:italic}
+.tile-text-art.tile-pattern-4:before{width:75%;border-width:18px;opacity:.1;right:-35%;top:-55%}
+.tile-text-art.tile-pattern-5{background:linear-gradient(90deg,var(--accent) 0 8px,color-mix(in srgb,var(--accent) 11%,#fff) 8px)}
+.tile-text-art.tile-pattern-5:after{display:none}
+.tile-text-art.tile-pattern-6{background:radial-gradient(circle at 88% 16%,color-mix(in srgb,var(--accent) 28%,transparent) 0 9%,transparent 9.5%),linear-gradient(145deg,#fff,color-mix(in srgb,var(--accent) 18%,#fff))}
+.tile-text-art.tile-pattern-7:before{width:85%;border-radius:0;border-width:1px;transform:rotate(-12deg);right:-47%;top:-45%}
+.tile-text-art.tile-pattern-8{background:linear-gradient(155deg,color-mix(in srgb,var(--accent) 15%,#fff),#fff4dc)}
+.tile-text-art.tile-pattern-8 h3{font-family:"Space Grotesk",sans-serif;text-transform:uppercase;letter-spacing:-.045em}
+.tetrisCluster .tile-text-art .tileBody{justify-content:space-between}
+.tetrisCluster .tile-text-art h3{margin:auto 0}
+@media(max-width:650px){.tile-text-art:before{opacity:.22}.tile-text-art:after{height:6px}}
+
 /* V6: every headline in the strip leads somewhere. */
 .newsWire{grid-column:auto}.newsWire .ticker i{display:inline-flex;align-items:center;gap:18px;padding-left:100%}.newsWire a{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-style:normal;text-decoration:none}.newsWire a:hover{text-decoration:underline;text-underline-offset:3px}.newsWire a em{font:700 7px "DM Sans",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}.newsWire a strong{margin-left:10px;color:var(--orange);font:12px Georgia,serif}
 @media(max-width:650px){.newsWire{flex-basis:520px!important}}

@@ -1,13 +1,20 @@
-# Better Start Personalized — Prototype 2
+# Better Start Personalized — V3
 
 This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## New in V2
+## New in V3
 
-- Seven specialist source packs:
+- Text-only stories receive intentional category-colored editorial art direction instead of looking like missing-image placeholders.
+- RSS image recovery now checks enclosures, media fields, lazy-loaded images and source sets before declaring a story text-only.
+- Fashion coverage now reaches runway, couture, French and Italian houses, costume design, fashion photography, archives and 1990s style.
+- A new Women, Culture + Modern Life desk covers women’s sports, WTA tennis, running, Pilates, wellness, beauty craft, writers, artists and leaders.
+- New interview pathways include “I follow fashion beyond what’s in stores,” “I want more stories about remarkable women” and “I notice the costumes before the plot.”
+
+- Eight specialist source packs:
   - The Sporting Life
   - Business, Ideas + Good Living
-  - Style + Fashion
+  - Fashion, Image + Style
+  - Women, Culture + Modern Life
   - Books, History + Archives
   - Movement + Wellbeing
   - Making, Fixing + Growing
@@ -21,7 +28,7 @@ This version makes personal editions meaningfully different by expanding the act
 
 ## Login-free deployment
 
-1. Create a new GitHub repository named `better-start-personalized-2`.
+1. Create a new GitHub repository named `better-start-personalized-3`.
 2. Upload the **contents** of this folder.
 3. In Vercel choose **Add New → Project** and import that repository.
 4. Leave the defaults unchanged and click **Deploy**.

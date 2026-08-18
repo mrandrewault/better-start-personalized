@@ -9,7 +9,7 @@ const topics=[
   {id:"food",label:"Food",color:"orange",size:"lg",children:["Restaurants","Cooking","Bakeries","Regional food","Food history","Coffee + tea","Markets","Small producers"]},
   {id:"science",label:"Science + nature",color:"green",children:["Space","Astronomy","Nature","Engineering","Mathematics","Oceans","Medicine","How things work"]},
   {id:"animals",label:"Animals",color:"yellow",size:"md",children:["Dogs","Cats","Wildlife","Animal rescue","Birds","Ocean life","Animal intelligence","Conservation"]},
-  {id:"sports",label:"Sports",color:"rust",children:["NFL + fantasy football","Baseball","Basketball","Soccer","Tennis","College sports","Great sports stories","Sports history"]},
+  {id:"sports",label:"Sports",color:"rust",children:["NFL + fantasy football","Baseball","Basketball","Women’s sports","Soccer","Tennis","College sports","Great sports stories","Sports history"]},
   {id:"photography",label:"Photography",color:"navy",size:"xl",children:["Documentary","Street photography","Film cameras","Landscape","Photo history","Portraits","Darkrooms","New photographers"]},
   {id:"books",label:"Books + ideas",color:"brown",size:"lg",children:["Fiction","History","Essays","Biography","Poetry","Book design","Independent magazines","Archives + museums"]},
   {id:"outdoors",label:"Nature + outdoors",color:"green",size:"xl",children:["Hiking","National parks","Gardens","Forests","Birding","Camping","Beautiful landscapes","Conservation"]},
@@ -21,10 +21,11 @@ const topics=[
   {id:"people",label:"Good people",color:"red",size:"md",children:["Human ingenuity","Kindness","Community projects","Creative lives","Big achievements","Small victories","Mentors","Unexpected friendships"]},
   {id:"technology",label:"Technology",color:"navy",children:["Apple","Audio gear","Cameras","Clean energy","Inventors","Robotics","Creative tools","Thoughtful AI"]},
   {id:"business",label:"Business + money",color:"green",children:["Markets","Entrepreneurship","Personal finance","Interesting companies","Real estate","Workplace ideas","Economic history","New inventions"]},
-  {id:"health",label:"Health + fitness",color:"red",children:["Yoga","Fitness","Running","Cycling","Mobility","Nutrition","Healthy aging","Everyday health"]},
+  {id:"health",label:"Health + fitness",color:"red",children:["Yoga","Pilates","Fitness","Women’s running","Running","Cycling","Mobility","Wellness retreats","Nutrition","Healthy aging","Everyday health"]},
   {id:"home",label:"Home + garden",color:"yellow",children:["Interior design","Gardens","Renovation","Organization","House history","Small spaces","Plants","Useful home ideas"]},
   {id:"family",label:"Family",color:"orange",children:["Things to do together","Parenting ideas","Children’s books","Education","College","Family travel","Youth sports","Useful local resources"]},
-  {id:"style",label:"Style + fashion",color:"blue",children:["Personal style","Sneakers","Menswear","Womenswear","Vintage clothing","Fashion history","Independent designers","Watches"]},
+  {id:"style",label:"Style + fashion",color:"blue",children:["Runway + couture","Costume design","International fashion","Womenswear","Fashion photography","Vintage clothing","1990s fashion","Beauty + cosmetics","Independent designers","Personal style","Menswear","Sneakers","Watches"]},
+  {id:"women",label:"Women + culture",color:"red",children:["Women leaders","Women writers","Women in the arts","Women’s sports","Women’s tennis","Women’s running","Pilates","Wellness retreats","Costume design","Fashion photography","Beauty + cosmetics"]},
   {id:"gaming",label:"Gaming",color:"navy",children:["New games","Retro gaming","Game design","Nintendo","PlayStation","Xbox","PC gaming","Indie games"]},
   {id:"cars",label:"Cars, boats + transportation",color:"rust",children:["New cars","Classic cars","Automotive design","Motorcycles","Boats + sailing","Boatbuilding","Trains","Aviation"]}
 ];
@@ -52,6 +53,9 @@ const doorways=[
   ,{id:"garden",label:"I’m happiest in a garden",signals:["home","outdoors"],color:"green",size:"md"}
   ,{id:"water",label:"I love boats and being on the water",signals:["cars","outdoors","travel"],color:"navy",size:"xl"}
   ,{id:"history",label:"History sends me down rabbit holes",signals:["books","design"],color:"brown",size:"lg"}
+  ,{id:"fashion",label:"I follow fashion beyond what’s in stores",signals:["style","women","photography","design"],color:"blue",size:"xl"}
+  ,{id:"women-stories",label:"I want more stories about remarkable women",signals:["women","books","sports","people"],color:"red",size:"lg"}
+  ,{id:"costumes",label:"I notice the costumes before the plot",signals:["style","film","women"],color:"yellow",size:"lg"}
 ];
 const specifics={
   "Hip-hop + rap":["New hip-hop","Golden age hip-hop","Beat-making","Independent rap","Live performances","Hip-hop history"],"Pop":["New pop","Live performances","Songwriting","Pop history","Great producers"],"Rock":["Classic rock","Indie rock","Live archives","New releases","Rock history"],"R&B + soul":["Classic soul","New R&B","Motown","Live sessions","Great vocalists"],"Jazz":["Alice Coltrane","Bill Frisell","Blue Note","Hard bop","ECM","Spiritual jazz"],"Country":["Classic country","Americana","New country","Songwriters","Live sessions"],"Classical":["Solo piano","20th-century composers","Chamber music","Orchestras","New recordings"],"Electronic":["Ambient","Synthesizers","Dance music","Experimental electronic","Studio craft"],
@@ -78,6 +82,21 @@ const specifics={
   ,"Yoga":["Yoga practice","Mobility","Breathwork","Yoga history","Teachers worth knowing"]
   ,"History":["Social history","Design history","Archives","Archaeology","Local history","Museums"]
   ,"Gardens":["Garden design","Native plants","Botanical gardens","Small gardens","Horticultural craft"]
+  ,"Runway + couture":["Paris couture","Milan fashion week","Atelier craft","Runway reviews","Fashion houses","Emerging designers"]
+  ,"International fashion":["French fashion","Italian fashion","Japanese designers","London fashion","Global street style"]
+  ,"Womenswear":["Missoni","Pucci","Oscar de la Renta","Prada","Vintage designer fashion","Independent labels"]
+  ,"Costume design":["Television wardrobes","Film costume design","Emily in Paris style","Period costume","Costume designer interviews"]
+  ,"Fashion photography":["Editorial photography","Legendary image-makers","1990s supermodels","Fashion archives","New photographers"]
+  ,"1990s fashion":["Supermodel era","Runway archives","Carolyn Bessette-Kennedy style","Minimalism","Vintage magazines"]
+  ,"Beauty + cosmetics":["Beauty as design","Cosmetic history","Independent founders","Fragrance","Packaging + formulation"]
+  ,"Women’s sports":["WNBA","Women’s soccer","Women’s tennis","Elite runners","Athlete profiles","Great comebacks"]
+  ,"Women’s tennis":["WTA","US Open","Player profiles","Tennis history","Rising players"]
+  ,"Women’s running":["Runner profiles","Movement for joy","Training","Trail running","Running communities"]
+  ,"Pilates":["Pilates practice","Studio design","Mobility","Teachers worth knowing","Movement history"]
+  ,"Wellness retreats":["Destination wellness","Spa design","Restorative travel","Mindful movement","Beautiful settings"]
+  ,"Women leaders":["Creative leaders","Women founders","Scientists","Designers","Cultural leaders"]
+  ,"Women writers":["Ann Patchett","Novelists","Essayists","Author interviews","Independent bookshops"]
+  ,"Women in the arts":["Artists","Photographers","Architects","Curators","Major retrospectives"]
 };
 const defaultSpecifics=label=>[`${label} stories`,`${label} discoveries`,`${label} history`,`${label} people`];
 const readerDefaults={design:"Established Better Start Reader layout on desktop and mobile",safety:"Established rage-free, politics-free and blocked-content policy",radio:"Ambient",feedback:"More like this, Less, Too political and Too depressing",memory:"No duplicate content and no repeats within seven days",connections:"Offer optional service connections only in context, after the person uses the relevant feature"};
@@ -111,6 +130,6 @@ export default function MakeItYours(){
     {step===2&&<section className="screen"><StepHeader eyebrow="ONE LAST PASS" title="Anything here feel especially you?" copy="Pick any names or ideas you especially like."/><div className={`constellation details ${details.length?"hasSelection":""}`}>{detailOptions.map((item,index)=><Bubble key={`${item.parent}-${item.label}`} {...item} depth={2} index={index} selected={details.includes(item.label)} onClick={()=>setDetails(toggle(details,item.label))}/>)}</div><div className="optional"><label><span>Anything we missed? <i>Optional</i></span><input value={extra} onChange={event=>setExtra(event.target.value)} placeholder="Toss in a person, place, hobby, team, food, website—anything."/></label></div></section>}
     {step===3&&<section className="screen finish"><StepHeader eyebrow="THAT’S PLENTY TO BEGIN" title="Your edition is ready." copy="Better Start can learn the rest while you enjoy it."/><div className="profile"><div className="profileName"><span>Name your edition <i>Optional</i></span><input value={name} onChange={event=>setName(event.target.value)} placeholder="Your first name"/><h2>{profile.title}</h2></div><div className="profileCloud">{[...profile.broadInterests,...neighborhoods,...details,...profile.anythingElse].slice(0,22).map((item,index)=><span className={`p-${index%5}`} key={`${item}-${index}`}>{item}</span>)}</div><div className="promise"><b>Already taken care of</b><p>The playful Reader design, mobile layout, ambient radio, rage-free editorial rules, source variety, duplicate protection and seven-day memory are all built in. You can teach it more with <em>More like this</em> and <em>Less</em> while you browse.</p></div></div></section>}
     <nav><button disabled={step===0} onClick={()=>setStep(value=>Math.max(0,value-1))}>← Back</button>{step<2&&<button className="primary" disabled={step===0?!doorwayPicks.length:!neighborhoods.length} onClick={next}>{step===0?"Get a little more specific":"One last pass"}<span>→</span></button>}{step===2&&<button className="primary" onClick={next}>This feels like me <span>→</span></button>}{step===3&&<button className="primary" onClick={buildEdition}>Open my edition <span>→</span></button>}</nav>
-    <footer><span>No account connections. No setup homework.</span><span>Prototype 05 · Saved privately in this browser</span></footer>
+    <footer><span>No account connections. No setup homework.</span><span>Personalized V3 · Saved privately in this browser</span></footer>
   </main>
 }

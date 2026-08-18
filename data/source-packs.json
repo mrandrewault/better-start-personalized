@@ -25,14 +25,34 @@
   },
   {
     "id":"fashion-style",
-    "label":"Style + Fashion",
-    "signals":["fashion","style","sneakers","menswear","womenswear","vintage clothing","watch","independent designers"],
+    "label":"Fashion, Image + Style",
+    "signals":["fashion","style","sneakers","menswear","womenswear","vintage clothing","watch","independent designers","runway","couture","costume design","supermodels","luxury","cosmetics","missoni","pucci","oscar de la renta"],
     "sources":[
-      {"name":"Vogue Runway","url":"https://news.google.com/rss/search?q=site%3Avogue.com%2Ffashion-shows+collection+designer+craft+-politics&hl=en-US&gl=US&ceid=US:en","section":"FASHION + STYLE","quality":9},
+      {"name":"Vogue Runway","url":"https://news.google.com/rss/search?q=site%3Avogue.com%2Ffashion-shows+runway+collection+designer+couture+-politics&hl=en-US&gl=US&ceid=US:en","section":"FASHION + STYLE","quality":10},
+      {"name":"Vogue France + Italia","url":"https://news.google.com/rss/search?q=%28site%3Avogue.fr+OR+site%3Avogue.it%29+fashion+designer+atelier+runway+-politics&hl=en-US&gl=US&ceid=US:en","section":"INTERNATIONAL FASHION","quality":10},
+      {"name":"The Fashion Image","url":"https://news.google.com/rss/search?q=fashion+photographer+editorial+archive+exhibition+portrait+-politics&hl=en-US&gl=US&ceid=US:en","section":"FASHION + PHOTOGRAPHY","quality":10},
+      {"name":"Costume Department","url":"https://news.google.com/rss/search?q=costume+designer+television+film+wardrobe+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"COSTUME + SCREEN","quality":10},
+      {"name":"Fashion Archives","url":"https://news.google.com/rss/search?q=1990s+fashion+supermodel+archive+vintage+designer+exhibition+-politics&hl=en-US&gl=US&ceid=US:en","section":"FASHION HISTORY","quality":9},
+      {"name":"Italian Houses","url":"https://news.google.com/rss/search?q=Missoni+Pucci+Versace+Prada+Italian+fashion+archive+collection+-politics&hl=en-US&gl=US&ceid=US:en","section":"ITALIAN STYLE","quality":10},
       {"name":"Independent Style","url":"https://news.google.com/rss/search?q=independent+fashion+designer+studio+craft+collection+-politics&hl=en-US&gl=US&ceid=US:en","section":"FASHION + STYLE","quality":9},
       {"name":"Menswear Details","url":"https://news.google.com/rss/search?q=menswear+tailoring+workwear+style+history+craft+-politics&hl=en-US&gl=US&ceid=US:en","section":"STYLE + CRAFT","quality":8},
       {"name":"Sneaker Design","url":"https://news.google.com/rss/search?q=sneaker+design+archive+collaboration+new+release+-politics&hl=en-US&gl=US&ceid=US:en","section":"STYLE + DESIGN","quality":8},
       {"name":"Watchmakers","url":"https://news.google.com/rss/search?q=watchmaking+independent+watchmaker+design+craft+new+-politics&hl=en-US&gl=US&ceid=US:en","section":"STYLE + CRAFT","quality":8}
+    ]
+  },
+  {
+    "id":"women-culture",
+    "label":"Women, Culture + Modern Life",
+    "signals":["women","women's sports","wnba","women's tennis","women's running","pilates","wellness retreats","cosmetics","beauty","women leaders","women writers","ann patchett","costume design","womenswear","supermodels"],
+    "sources":[
+      {"name":"Women Who Lead","url":"https://news.google.com/rss/search?q=women+leader+founder+designer+scientist+author+profile+achievement+-politics&hl=en-US&gl=US&ceid=US:en","section":"WOMEN + IDEAS","quality":10},
+      {"name":"Women’s Sports","url":"https://news.google.com/rss/search?q=%28WNBA+OR+women%27s+tennis+OR+women%27s+soccer%29+player+profile+achievement+community+-politics+-betting&hl=en-US&gl=US&ceid=US:en","section":"WOMEN’S SPORTS","quality":10},
+      {"name":"WTA Tennis","url":"https://news.google.com/rss/search?q=site%3Awtatennis.com%2Fnews+player+feature+comeback+champion+US+Open+-politics&hl=en-US&gl=US&ceid=US:en","section":"WOMEN’S TENNIS","quality":10},
+      {"name":"Women’s Running","url":"https://news.google.com/rss/search?q=%28site%3Awomensrunning.com+OR+site%3Awomensrunning.co.uk%29+running+training+joy+profile+-politics&hl=en-US&gl=US&ceid=US:en","section":"RUNNING + WELLBEING","quality":9},
+      {"name":"Pilates + Movement","url":"https://news.google.com/rss/search?q=pilates+movement+studio+teacher+wellbeing+retreat+-politics&hl=en-US&gl=US&ceid=US:en","section":"PILATES + WELLBEING","quality":9},
+      {"name":"Beauty as Craft","url":"https://news.google.com/rss/search?q=cosmetics+beauty+founder+formulation+design+history+craft+-politics&hl=en-US&gl=US&ceid=US:en","section":"BEAUTY + CRAFT","quality":9},
+      {"name":"Women Writers","url":"https://news.google.com/rss/search?q=women+author+novelist+interview+new+book+Ann+Patchett+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOOKS + PEOPLE","quality":10},
+      {"name":"Women in the Arts","url":"https://news.google.com/rss/search?q=woman+artist+photographer+architect+designer+exhibition+retrospective+-politics&hl=en-US&gl=US&ceid=US:en","section":"WOMEN + ARTS","quality":10}
     ]
   },
   {

@@ -30,7 +30,16 @@ function canonicalUrl(value = "") {
 }
 function imageFor(item) {
   const html = item.content || item["content:encoded"] || "";
-  return item.enclosure?.url || item.mediaContent?.$?.url || item.mediaThumbnail?.$?.url || html.match(/<img[^>]+src=["']([^"']+)/i)?.[1] || null;
+  const mediaContent = Array.isArray(item.mediaContent) ? item.mediaContent : [item.mediaContent];
+  const mediaThumbnail = Array.isArray(item.mediaThumbnail) ? item.mediaThumbnail : [item.mediaThumbnail];
+  const candidates = [
+    item.enclosure?.url,
+    ...mediaContent.map(value => value?.$?.url || value?.url),
+    ...mediaThumbnail.map(value => value?.$?.url || value?.url),
+    html.match(/<img[^>]+(?:data-lazy-src|data-src|src)=["']([^"']+)/i)?.[1],
+    html.match(/<img[^>]+srcset=["']([^"' ,]+)/i)?.[1]
+  ].filter(Boolean);
+  return candidates.find(url => !/pixel|spacer|tracking|1x1|blank\.(gif|png)/i.test(url)) || null;
 }
 function itemText(item) { return `${item.title || ""} ${item.contentSnippet || ""} ${item.content || ""}`.toLowerCase(); }
 function isDisallowed(item) {
@@ -46,7 +55,7 @@ function isJoyful(item) {
 }
 function isSpecialistWorthwhile(item) {
   const value = `${item.title || ""} ${item.summary || ""}`;
-  return /profile|interview|explainer|guide|design|history|archive|craft|studio|maker|founder|company|business|market|finance|style|fashion|collection|book|author|library|museum|yoga|movement|fitness|garden|plant|workshop|repair|restor|car|automotive|boat|sail|maritime|train|aviation|team|player|baseball|tennis|football|soccer/i.test(value) && !hasBadMood(value);
+  return /profile|interview|explainer|guide|design|history|archive|craft|studio|maker|founder|leader|company|business|market|finance|style|fashion|couture|runway|atelier|collection|costume|wardrobe|beauty|cosmetic|photographer|supermodel|book|author|novelist|library|museum|yoga|pilates|movement|wellness|fitness|running|garden|plant|workshop|repair|restor|car|automotive|boat|sail|maritime|train|aviation|team|player|wnba|baseball|tennis|football|soccer/i.test(value) && !hasBadMood(value);
 }
 function isFreshLocal(item) {
   if (!item.date) return true;
