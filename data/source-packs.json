@@ -165,5 +165,17 @@
       {"name":"NASA","url":"https://www.nasa.gov/rss/dyn/breaking_news.rss","section":"SCIENCE + NATURE","quality":11},
       {"name":"MIT Technology Review","url":"https://news.google.com/rss/search?q=site%3Atechnologyreview.com+innovation+science+design+-politics&hl=en-US&gl=US&ceid=US:en","section":"TECHNOLOGY + IDEAS","quality":10}
     ]
+  },
+  {
+    "id":"philanthropy-community",
+    "label":"Philanthropy + Community",
+    "signals":["philanthropy","giving","donation","community foundation","scholarship","arts access","libraries + schools","money put to good use","mackenzie scott","public spaces"],
+    "sources":[
+      {"name":"Giving With Results","url":"https://news.google.com/rss/search?q=%28philanthropy+OR+donation%29+community+impact+library+school+housing+food+access+-politics+-amazon+-bezos&hl=en-US&gl=US&ceid=US:en","section":"GIVING + COMMUNITY","quality":11},
+      {"name":"MacKenzie Scott Giving","url":"https://news.google.com/rss/search?q=%22MacKenzie+Scott%22+donation+nonprofit+community+impact+-politics+-Amazon+-Bezos&hl=en-US&gl=US&ceid=US:en","section":"PHILANTHROPY + PEOPLE","quality":11},
+      {"name":"Libraries + Learning","url":"https://news.google.com/rss/search?q=donation+opens+library+scholarship+arts+education+community+-politics&hl=en-US&gl=US&ceid=US:en","section":"LEARNING + ACCESS","quality":10},
+      {"name":"Community Foundations","url":"https://news.google.com/rss/search?q=community+foundation+grant+local+nonprofit+measurable+impact+-politics&hl=en-US&gl=US&ceid=US:en","section":"COMMUNITY + PROGRESS","quality":10},
+      {"name":"Public Good","url":"https://news.google.com/rss/search?q=philanthropic+gift+park+museum+hospital+housing+community+opens+-politics+-Amazon+-Bezos&hl=en-US&gl=US&ceid=US:en","section":"PUBLIC GOOD","quality":10}
+    ]
   }
 ]

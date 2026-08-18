@@ -39,12 +39,14 @@ function imageFor(item) {
     html.match(/<img[^>]+(?:data-lazy-src|data-src|src)=["']([^"']+)/i)?.[1],
     html.match(/<img[^>]+srcset=["']([^"' ,]+)/i)?.[1]
   ].filter(Boolean);
-  return candidates.find(url => !/pixel|spacer|tracking|1x1|blank\.(gif|png)|lh3\.googleusercontent\.com\/J6_coFbogx/i.test(url)) || null;
+  return candidates.find(url => !/pixel|spacer|tracking|1x1|blank\.(gif|png)|favicon|avatar|default[-_ ]?image|site[-_ ]?logo|brandmark|lh3\.googleusercontent\.com\/J6_coFbogx/i.test(url)) || null;
 }
 function itemText(item) { return `${item.title || ""} ${item.contentSnippet || ""} ${item.content || ""}`.toLowerCase(); }
 function isDisallowed(item) {
   const value = policyText(`${item.title || ""} ${item.summary || ""} ${item.contentSnippet || ""} ${item.source || ""} ${item.section || ""}`);
-  return blockedTerms.some(term => value.includes(policyText(term)));
+  const raw = `${item.title || ""} ${item.summary || ""} ${item.contentSnippet || ""} ${item.source || ""} ${item.section || ""}`;
+  const corporateAmazon = /\bamazon(?:'s)?\b/i.test(raw) && !/\bamazon (?:rainforest|river|basin|forest|region|wildlife)\b/i.test(raw);
+  return corporateAmazon || /\bjeff bezos\b/i.test(raw) || bodyAnxiety.test(raw) || blockedTerms.some(term => value.includes(policyText(term)));
 }
 function hasBadMood(value) {
   return /killed|deadly|fatal|crash|unsafe|controvers|war|attack|crisis|disaster|outrage|scandal|cancer|dies?\b|death|threat|fear|horrific|tariffs?|banned|terrible|abuse|neglect|euthan|injur|defeat|worsen|\bworst\b/i.test(value);
@@ -57,7 +59,7 @@ function isSpecialistWorthwhile(item) {
   const value = `${item.title || ""} ${item.summary || ""}`;
   return /profile|interview|explainer|guide|design|history|archive|craft|studio|maker|founder|leader|company|business|market|finance|style|fashion|couture|runway|atelier|collection|costume|wardrobe|beauty|cosmetic|photographer|supermodel|book|author|novelist|library|museum|yoga|pilates|movement|wellness|fitness|running|garden|plant|workshop|repair|restor|car|automotive|boat|sail|maritime|train|aviation|team|player|wnba|baseball|tennis|football|soccer/i.test(value) && !hasBadMood(value);
 }
-const bodyAnxiety = /\b(bmi|body fat|weight loss|lose weight|obesity|overweight|fat burning|belly fat|calorie deficit|dieting|slim down|beach body|anti-aging)\b/i;
+const bodyAnxiety = /\b(bmi|body fat|weight[- ]loss|lose weight|obesity|overweight|fat burning|belly fat|calorie deficit|dieting|slim down|thinness|being thin|beach body|anti-aging)\b/i;
 const distressedAnimal = /\b(abuse|abandoned|starving|dying|near death|neglect|euthan|dumped|injured|horrific|suffering|thousands of miles away)\b/i;
 function detectEditorialIdentity(interests, activePacks) {
   const identities = load("editorial-identities.json"), haystack = ` ${interests.join(" ").toLowerCase()} `;
@@ -74,6 +76,20 @@ function contextAllowed(item, identity) {
   if (identity.id === "sports" && /\b(odds|betting|sportsbook|parlay|wager)\b/i.test(value)) return false;
   return true;
 }
+
+function visualFirst(items, identity, count = 20, target = 12) {
+  const opening = items.slice(0, count), rest = items.slice(count);
+  let visualCount = opening.filter(item => item.image).length;
+  while (visualCount < target) {
+    const replacement = rest.findIndex(item => item.image && isIdentityStory(item, identity));
+    const fallback = replacement >= 0 ? replacement : rest.findIndex(item => item.image);
+    const textSlot = opening.map((item, index) => ({item, index})).reverse().find(entry => !entry.item.image)?.index;
+    if (fallback < 0 || textSlot === undefined) break;
+    const [visual] = rest.splice(fallback, 1), [text] = opening.splice(textSlot, 1, visual);
+    rest.unshift(text); visualCount++;
+  }
+  return [...opening, ...rest];
+}
 function isIdentityStory(item, identity) {
   if (identity.id === "general") return item.personalFit !== "editorial";
   return identity.packs.includes(item.sourcePack) || identity.signals.some(signal => policyText(`${item.title} ${item.summary} ${item.section} ${item.source}`).includes(policyText(signal)));
@@ -87,7 +103,7 @@ async function enrichStoryImage(item) {
     const image = html.match(/<meta[^>]+property=["']og:image(?::url)?["'][^>]+content=["']([^"']+)/i)?.[1]
       || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::url)?["']/i)?.[1]
       || html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)/i)?.[1];
-    return image && /^https?:/i.test(image) && !/lh3\.googleusercontent\.com\/J6_coFbogx|news\.google\.com/i.test(image) ? {...item, image, format:"visual", imageEnriched:true} : item;
+    return image && /^https?:/i.test(image) && !/lh3\.googleusercontent\.com\/J6_coFbogx|news\.google\.com|favicon|avatar|default[-_ ]?image|site[-_ ]?logo|brandmark/i.test(image) ? {...item, image, format:"visual", imageEnriched:true} : item;
   } catch { return item; }
 }
 async function enrichIdentityImages(items, identity) {
@@ -300,8 +316,8 @@ export async function GET(request) {
       if (otherQueue.length && (opening.length > 18 || editorialIdentity.id !== "fashion")) opening.push(otherQueue.shift());
       if (!visualQueue.length && !textQueue.length) opening.push(...otherQueue.splice(0));
     }
-    gallery = claim(opening);
-  } else gallery = claim(compose(galleryPool, 140, {}, random));
+    gallery = claim(visualFirst(opening, editorialIdentity));
+  } else gallery = claim(visualFirst(compose(galleryPool, 140, {}, random), editorialIdentity));
   const serendipityPool = all.filter(item => item.noHits === 0 && !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   const serendipity = claim(compose(serendipityPool, 60, {}, random));
 

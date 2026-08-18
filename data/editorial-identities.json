@@ -17,8 +17,8 @@
   },
   "business": {
     "label": "Business, Ideas + Good Living",
-    "packs": ["business-culture"],
-    "signals": ["business", "finance", "markets", "money", "founder", "company", "entrepreneur", "urbanism"],
+    "packs": ["business-culture", "philanthropy-community"],
+    "signals": ["business", "finance", "markets", "money", "founder", "company", "entrepreneur", "urbanism", "philanthropy", "money put to good use", "community foundation"],
     "references": ["Monocle", "Financial Times Weekend", "Bloomberg Businessweek", "Fast Company", "Morningstar", "A Wealth of Common Sense", "Huddle Up"],
     "accent": "ledger",
     "imageTarget": 0.48

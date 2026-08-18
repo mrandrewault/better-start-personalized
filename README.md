@@ -1,8 +1,16 @@
-# Better Start Personalized — V5
+# Better Start Personalized — V6
 
 This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## New in V5
+## New in V6
+
+- A calmer four-pass taste interview: 12 broad opening choices, a tailored follow-up, subjects, then names and specifics.
+- A new Philanthropy + Community lane emphasizes beneficiaries, measurable results and money put to genuine public use.
+- Amazon and Jeff Bezos are blocked globally; MacKenzie Scott and constructive philanthropy remain welcome.
+- The first 20 Good Stuff stories target at least 60% genuine editorial imagery, without logos or generic thumbnails counting as pictures.
+- Weight-loss and body-anxiety filters now cover hyphenated wording and every visible page surface.
+
+## Editorial identity foundation
 
 - An editorial identity engine gives fashion, sports, business, outdoors, food, arts, science, books and making-focused editions their own publication logic.
 - Fashion-led editions use a restrained cream, black and seasonal-accent system inspired by independent fashion magazines—not default pink.
