@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: "Better Start — Andrew's Edition",
+  title: "Upwards — Andrew's Edition",
   description: "A personalized editorial morning homepage"
 };
 

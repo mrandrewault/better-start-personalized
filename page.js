@@ -12,16 +12,16 @@ export default function Home(){
  useEffect(()=>{const t=setInterval(()=>setNow(new Date()),60000);fetch("/api/feed").then(r=>r.json()).then(setData).catch(()=>{});fetch("/api/weather").then(r=>r.json()).then(setWeather).catch(()=>{});return()=>clearInterval(t)},[]);
  const greeting=now.getHours()<12?"GOOD MORNING":now.getHours()<17?"GOOD AFTERNOON":"GOOD EVENING";
  const date=now.toLocaleDateString(undefined,{weekday:"long",year:"numeric",month:"long",day:"numeric"});
- const rate=(item,action)=>{const a=JSON.parse(localStorage.getItem("betterStartFeedback")||"[]");a.push({url:item.url,title:item.title,source:item.source,action,ts:Date.now()});localStorage.setItem("betterStartFeedback",JSON.stringify(a.slice(-250)))};
+ const rate=(item,action)=>{const a=JSON.parse(localStorage.getItem("upwardsFeedback")||"[]");a.push({url:item.url,title:item.title,source:item.source,action,ts:Date.now()});localStorage.setItem("upwardsFeedback",JSON.stringify(a.slice(-250)))};
  const f=data?.forYou||[], hero=f[0], side=f.slice(1,4), flow=f.slice(4,more?18:10);
 
  return <main className="shell">
-  <header className="mast"><div className="brand">Better Start — Andrew&apos;s Edition</div><div className="micro">{data?`${data.sourceStatus.successful}/${data.sourceStatus.total} live feeds connected`:"Loading live edition…"}</div></header>
+  <header className="mast"><div className="brand">Upwards — Andrew&apos;s Edition</div><div className="micro">{data?`${data.sourceStatus.successful}/${data.sourceStatus.total} live feeds connected`:"Loading live edition…"}</div></header>
   <div className="greeting">{greeting}</div><div className="date">{date}</div>
 
   <div className="glance">
    <div className="glanceCard"><div className="glanceKicker">Weather · New Canaan</div><div className="glanceMain">{weather?.high?`${weather.high}° / ${weather.low}°`:"Loading…"}</div><div className="glanceSub">{weather?.precip!=null?`${weather.precip}% precipitation · ${weather.current}° now`:"Live forecast"}</div></div>
-   <div className="glanceCard"><div className="glanceKicker">Today's soundtrack</div><div className="glanceMain">Better Start Radio</div><div className="glanceSub">Reserved for the simple one-button music idea.</div></div>
+   <div className="glanceCard"><div className="glanceKicker">Today's soundtrack</div><div className="glanceMain">Upwards Radio</div><div className="glanceSub">Reserved for the simple one-button music idea.</div></div>
    <div className="glanceCard"><div className="glanceKicker">Freshest favorite</div><div className="glanceMain">{data?.favorites?.[0]?.name||"Loading…"}</div><div className="glanceSub">{data?.favorites?.[0]?.title?.slice(0,85)||"Checking favorites…"}</div></div>
    <div className="glanceCard"><div className="glanceKicker">Visual break</div><div className="glanceMain">Today's Eye</div><div className="glanceSub">Three photo/art favorites rotate here.</div></div>
   </div>

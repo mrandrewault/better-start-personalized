@@ -4,7 +4,7 @@ import path from "path";
 
 const parser = new Parser({
   timeout: 9000,
-  headers: {"User-Agent": "BetterStart/2.0"},
+  headers: {"User-Agent": "Upwards/2.0"},
   customFields: {item: [["media:content", "mediaContent"], ["media:thumbnail", "mediaThumbnail"]]}
 });
 const dataPath = name => path.join(process.cwd(), "data", name);
@@ -68,7 +68,7 @@ function detectEditorialIdentity(interests, activePacks) {
     const packHits = activePacks.reduce((total, pack) => total + (identity.packs.includes(pack.id) ? pack.hits : 0), 0);
     return {id, ...identity, score:signalHits * 3 + packHits * 2};
   }).filter(identity => identity.score > 0).sort((a, b) => b.score - a.score);
-  return ranked[0] || {id:"general", label:"Better Start Reader", references:[], accent:"classic", imageTarget:.52, score:0};
+  return ranked[0] || {id:"general", label:"Upwards Reader", references:[], accent:"classic", imageTarget:.52, score:0};
 }
 function contextAllowed(item, identity) {
   const value = `${item.title || ""} ${item.summary || ""}`;
@@ -100,7 +100,7 @@ function isIdentityStory(item, identity) {
 async function enrichStoryImage(item) {
   if (item.image || !item.url || item.url === "#") return item;
   try {
-    const response = await fetch(item.url, {redirect:"follow", headers:{"User-Agent":"Mozilla/5.0 BetterStart/5.0"}, signal:AbortSignal.timeout(2800)});
+    const response = await fetch(item.url, {redirect:"follow", headers:{"User-Agent":"Mozilla/5.0 Upwards/5.0"}, signal:AbortSignal.timeout(2800)});
     if (!response.ok) return item;
     const html = await response.text();
     const image = html.match(/<meta[^>]+property=["']og:image(?::url)?["'][^>]+content=["']([^"']+)/i)?.[1]
@@ -165,7 +165,7 @@ async function loadVisualShelf(identity, count = 80) {
   await Promise.all(searches.map(async search => {
     try {
       const params = new URLSearchParams({action:"query",generator:"search",gsrsearch:search,gsrnamespace:"6",gsrlimit:"30",prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"1400",format:"json",origin:"*"});
-      const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {headers:{"User-Agent":"BetterStart/10.0 (visual shelf; attributed Commons media)"}, signal:AbortSignal.timeout(5500)});
+      const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {headers:{"User-Agent":"Upwards/10.0 (visual shelf; attributed Commons media)"}, signal:AbortSignal.timeout(5500)});
       if (!response.ok) return;
       const payload = await response.json();
       Object.values(payload?.query?.pages || {}).forEach(page => {
@@ -283,7 +283,7 @@ function compose(candidates, count, seed = {}, random = Math.random) {
   }
   return chosen;
 }
-function seededRandom(value = "better-start") {
+function seededRandom(value = "upwards") {
   let state = 2166136261;
   for (let index = 0; index < value.length; index++) state = Math.imul(state ^ value.charCodeAt(index), 16777619);
   return () => { state += 0x6D2B79F5; let result = state; result = Math.imul(result ^ result >>> 15, result | 1); result ^= result + Math.imul(result ^ result >>> 7, result | 61); return ((result ^ result >>> 14) >>> 0) / 4294967296; };
@@ -300,7 +300,7 @@ function activateSourcePacks(interests, packs) {
 async function sharedVideoSources() {
   const fallback = load("video-sources.json"), url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL, token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
   if (!url || !token) return fallback;
-  try { const response = await fetch(url, {method:"POST", headers:{authorization:`Bearer ${token}`,"content-type":"application/json"}, body:JSON.stringify(["GET","betterstart:sources"]), cache:"no-store"}); const value = (await response.json()).result; return value ? JSON.parse(value) : fallback; } catch { return fallback; }
+  try { const response = await fetch(url, {method:"POST", headers:{authorization:`Bearer ${token}`,"content-type":"application/json"}, body:JSON.stringify(["GET","upwards:sources"]), cache:"no-store"}); const value = (await response.json()).result; return value ? JSON.parse(value) : fallback; } catch { return fallback; }
 }
 async function loadReaderVideos(avoid = new Set()) {
   const videoSources = await sharedVideoSources();

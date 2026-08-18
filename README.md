@@ -1,4 +1,4 @@
-# Better Start Personalized — V11
+# Upwards — Personalized V11
 
 This version makes photography and playable media a composition requirement rather than a ranking preference.
 
@@ -78,7 +78,7 @@ This version makes photography and playable media a composition requirement rath
 
 ## Login-free deployment
 
-1. Create a new GitHub repository named `better-start-personalized-5`.
+1. Create a new GitHub repository named `upwards-news`.
 2. Upload the **contents** of this folder.
 3. In Vercel choose **Add New → Project** and import that repository.
 4. Leave the defaults unchanged and click **Deploy**.

@@ -3,7 +3,7 @@ import Parser from "rss-parser";
 import fs from "fs";
 import path from "path";
 
-const parser = new Parser({timeout:9000, headers:{"User-Agent":"BetterStart/1.0"}});
+const parser = new Parser({timeout:9000, headers:{"User-Agent":"Upwards/1.0"}});
 const load = n => JSON.parse(fs.readFileSync(path.join(process.cwd(),"data",n),"utf8"));
 
 function text(item){return `${item.title||""} ${item.contentSnippet||""} ${item.content||""}`.toLowerCase()}

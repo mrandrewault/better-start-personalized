@@ -224,7 +224,7 @@
 .tetrisCluster .fit-tight .tileBody p,.tetrisCluster .fit-tight .controls{display:none!important}
 .tetrisCluster .fit-tight .meta{margin-top:6px}.tetrisCluster .tile-video .tileBody{max-height:100%;overflow:hidden}
 
-/* V5: the same Better Start system, art-directed for the reader's strongest world. */
+/* V5: the same Upwards system, art-directed for the reader's strongest world. */
 .shell[class*="identity-"]{--identity-accent:var(--blue)}
 .identity-fashion{--paper:#f6f4ef;--card:#fff;--line:#c8c5bd;--identity-accent:#1267d6;background:#f6f4ef}
 .identity-fashion .mast{border-bottom-width:2px}.identity-fashion .brand{font-family:"DM Sans",sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:17px}
