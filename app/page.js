@@ -7,6 +7,25 @@ const SERENDIPITY_BATCH_SIZE = 9;
 const EDITION_MS = 2 * 60 * 60 * 1000;
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const PROFILE_KEY = "betterStartPersonalProfileV1";
+// A page-wide ink sequence. Families stay far apart locally; every later
+// appearance is remixed so an exact swatch is never repeated on the page.
+const INK_FAMILIES = [
+  {h:4,s:82,l:54},{h:214,s:76,l:48},{h:48,s:90,l:61},{h:276,s:55,l:48},
+  {h:151,s:65,l:36},{h:25,s:88,l:57},{h:195,s:78,l:72},{h:338,s:62,l:43},
+  {h:72,s:67,l:58},{h:232,s:58,l:32},{h:166,s:55,l:70},{h:15,s:72,l:72}
+];
+const mixedInk = (position = 0, edition = 0) => {
+  const family = INK_FAMILIES[(position + edition) % INK_FAMILIES.length];
+  const cycle = Math.floor(position / INK_FAMILIES.length);
+  // Golden-angle stepping prevents adjacent and nearby cards from landing in
+  // the same part of the color wheel, even as the wall grows indefinitely.
+  const hue = (family.h * .08 + (position + edition * 5) * 137.508 + cycle * .37) % 360;
+  const saturation = Math.max(42, Math.min(92, family.s + ((cycle * 7 + position) % 13) - 6));
+  const lightness = Math.max(27, Math.min(82, family.l + ((cycle * 11 + position * 3) % 17) - 8));
+  const darkInk = lightness > 61 || (lightness > 52 && saturation < 65);
+  const foreground = darkInk ? "#11100e" : "#fffdf7";
+  return {backgroundColor:`hsl(${hue.toFixed(1)} ${saturation}% ${lightness}%)`,color:foreground,"--tile-ink":foreground,"--accent":foreground};
+};
 const categoryClass = section => `cat-${(section || "news").toLowerCase().replace(/[^a-z]+/g, "-").replace(/(^-|-$)/g, "")}`;
 const normalizedIdentityTitle = value => (value || "").toLowerCase().replace(/\b(the|a|an|and|or|but|to|of|for|in|on|at|with|from)\b/g, " ").replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim();
 const emergencyBlocked = /\b(trump|maga|maha|nazi|neo[- ]?nazi|white supremac|shooting|gunman|murder|war|terroris|rape|sexual abuse|suicide|overdose|deadly|killed|outrage|religious|anti[- ]?vax|ufc|mma|gambling|google pixel|samsung galaxy|android phone|jeff bezos|bmi|body fat|weight[- ]loss|being thin|obesity|overweight)\b/i;
@@ -118,7 +137,7 @@ function JoyTile({item, index}) {
     {item.joyType === "doodle" && <PocketEtch variant={item.variant} />}
   </article>;
 }
-function Story({item, index, onRate, onSave, onShare, saved}) {
+function Story({item, index, paletteIndex = index, edition = 0, onRate, onSave, onShare, saved}) {
   const tileRef = useRef(null);
   const type = item.format || "article";
   const [playing, setPlaying] = useState(false);
@@ -157,7 +176,8 @@ function Story({item, index, onRate, onSave, onShare, saved}) {
     document.fonts?.ready.then(() => requestAnimationFrame(fitContents));
     return () => { observer.disconnect(); tile.querySelectorAll("img").forEach(image => image.removeEventListener("load", fitContents)); };
   }, [item.canonicalUrl, playing]);
-  return <article ref={tileRef} className={`tile tile-${type} tile-pattern-${index % 9} ${item.image ? "tile-has-image" : "tile-no-image tile-text-art"} ${categoryClass(item.section)}`}>
+  const inkStyle = !item.image && !playable ? mixedInk(paletteIndex, edition) : undefined;
+  return <article ref={tileRef} style={inkStyle} className={`tile tile-${type} tile-pattern-${index % 9} ${item.image ? "tile-has-image" : "tile-no-image tile-text-art tile-mixed-ink"} ${categoryClass(item.section)}`}>
     {playable && playing ? <div className="inlinePlayer"><iframe src={playerUrl} title={item.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen /></div> : item.image && (playable ? <button className="imageLink mediaTrigger" onClick={() => setPlaying(true)} aria-label={`Play ${item.title}`}><img src={item.image} alt="" onError={event => {event.currentTarget.src = FALLBACK;}} /><span className="play">▶</span></button> : <a className="imageLink" href={item.url} target="_blank" rel="noreferrer"><img src={item.image} alt="" onError={event => {event.currentTarget.src = FALLBACK;}} /></a>)}
     <div className="tileBody"><div className="kicker"><span>{item.section}</span><span>{type === "bandcamp" ? "New release" : type === "video" ? "Saved find" : age(item.date)}</span></div><h3><a href={item.url} target="_blank" rel="noreferrer">{item.title}</a></h3>{item.summary && type !== "visual" && <p>{item.summary.slice(0, type === "feature" ? 280 : 170)}</p>}<div className="meta">{item.sourcePackLabel && <i>From {item.sourcePackLabel}</i>}{item.source}</div><Feedback item={item} onRate={onRate} onSave={onSave} onShare={onShare} saved={saved}/></div>
   </article>;
@@ -207,12 +227,12 @@ export default function Home() {
 
     <section className="favoritesSection"><div className="sectionHead"><div><span>A few especially nice things</span><h2>Bright Spots</h2></div><p>Kindness, ingenuity & excellent dogs</p></div><div className="favorites">{uniqueFavorites.map(item => <a className="favorite" href={item.url} target="_blank" rel="noreferrer" key={item.canonicalUrl}><span>{age(item.date)}</span><h3>{item.title}</h3><b>{item.source}</b></a>)}</div></section>
 
-    <section className="gallerySection"><div className="sectionHead wallHead"><div><span>Every good magazine on the table</span><h2>Good Stuff</h2></div><p>Chosen for joy, curiosity & variety</p></div>{visibleBatches.length ? visibleBatches.map((batch, batchIndex) => <div className="galleryBatch" key={batchIndex}>{Array.from({length: Math.ceil(batch.length / 10)}, (_, clusterIndex) => { const cluster = arrangeForFrames(batch.slice(clusterIndex * 10, (clusterIndex + 1) * 10)), variant = (batchIndex * 3 + clusterIndex) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => item.format === "joy" ? <JoyTile item={item} index={batchIndex * BATCH_SIZE + clusterIndex * 10 + index} key={item.canonicalUrl} /> : <Story item={item} index={batchIndex * BATCH_SIZE + clusterIndex * 10 + index} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />)}</div>; })}</div>) : <div className="loading"><span>Composing today&apos;s wall</span><i /><i /><i /></div>}
+    <section className="gallerySection"><div className="sectionHead wallHead"><div><span>Every good magazine on the table</span><h2>Good Stuff</h2></div><p>Chosen for joy, curiosity & variety</p></div>{visibleBatches.length ? visibleBatches.map((batch, batchIndex) => <div className="galleryBatch" key={batchIndex}>{Array.from({length: Math.ceil(batch.length / 10)}, (_, clusterIndex) => { const cluster = arrangeForFrames(batch.slice(clusterIndex * 10, (clusterIndex + 1) * 10)), variant = (batchIndex * 3 + clusterIndex) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => { const absoluteIndex = batchIndex * BATCH_SIZE + clusterIndex * 10 + index; return item.format === "joy" ? <JoyTile item={item} index={absoluteIndex} key={item.canonicalUrl} /> : <Story item={item} index={absoluteIndex} paletteIndex={absoluteIndex} edition={data?.edition || 0} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />; })}</div>; })}</div>) : <div className="loading"><span>Composing today&apos;s wall</span><i /><i /><i /></div>}
       {batches * BATCH_SIZE < wall.length && <div className="loadWrap"><button className="loadBtn" onClick={() => setBatches(count => count + 1)}>Load 25 More Good Things<span>↓</span></button></div>}
     </section>
 
-    <section className="important"><div className="importantIntro"><span>Worth knowing</span><h2>Good News With Consequence</h2><p>A small, calm briefing about discoveries, progress and people making things better.</p></div><div className="importantGrid">{(data?.important || []).map((item, index) => <Story item={item} index={index} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />)}</div></section>
-    {!!uniqueSerendipity.length && <section className="serendipity"><div className="sectionHead"><div><span>One more magazine underneath</span><h2>You Didn&apos;t Ask For This…</h2></div><p>Worth the detour</p></div><div className="serendipityWall">{Array.from({length: Math.ceil(Math.min(serendipityCount, uniqueSerendipity.length) / 10)}, (_, clusterIndex) => { const cluster = arrangeForFrames(uniqueSerendipity.slice(clusterIndex * 10, Math.min(serendipityCount, (clusterIndex + 1) * 10))), variant = (clusterIndex + 1) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => <Story item={item} index={clusterIndex * 10 + index} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />)}</div>; })}</div>{serendipityCount < uniqueSerendipity.length && <div className="loadWrap"><button className="loadBtn surpriseBtn" onClick={() => setSerendipityCount(count => count + SERENDIPITY_BATCH_SIZE)}>Add More Stuff I Didn&apos;t Ask For<span>↓</span></button></div>}</section>}
+    <section className="important"><div className="importantIntro"><span>Worth knowing</span><h2>Good News With Consequence</h2><p>A small, calm briefing about discoveries, progress and people making things better.</p></div><div className="importantGrid">{(data?.important || []).map((item, index) => <Story item={item} index={index} paletteIndex={1000 + index} edition={data?.edition || 0} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />)}</div></section>
+    {!!uniqueSerendipity.length && <section className="serendipity"><div className="sectionHead"><div><span>One more magazine underneath</span><h2>You Didn&apos;t Ask For This…</h2></div><p>Worth the detour</p></div><div className="serendipityWall">{Array.from({length: Math.ceil(Math.min(serendipityCount, uniqueSerendipity.length) / 10)}, (_, clusterIndex) => { const cluster = arrangeForFrames(uniqueSerendipity.slice(clusterIndex * 10, Math.min(serendipityCount, (clusterIndex + 1) * 10))), variant = (clusterIndex + 1) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => { const absoluteIndex = clusterIndex * 10 + index; return <Story item={item} index={absoluteIndex} paletteIndex={2000 + absoluteIndex} edition={data?.edition || 0} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />; })}</div>; })}</div>{serendipityCount < uniqueSerendipity.length && <div className="loadWrap"><button className="loadBtn surpriseBtn" onClick={() => setSerendipityCount(count => count + SERENDIPITY_BATCH_SIZE)}>Add More Stuff I Didn&apos;t Ask For<span>↓</span></button></div>}</section>}
     <footer><b>BETTER START</b><span>Good things worth knowing · No outrage required</span></footer>
   </main>;
 }

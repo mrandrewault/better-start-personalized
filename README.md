@@ -1,8 +1,13 @@
-# Better Start Personalized — V7
+# Better Start Personalized — V8
 
 This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## New in V7
+## New in V8
+
+- Text-card colors are assigned by one page-wide palette sequence rather than repeating inside every layout cluster.
+- No exact background swatch is reused in the loaded page; returning color families receive different hue, saturation and lightness values.
+- Neighboring swatches come from deliberately separated color families, with automatic dark/light foreground contrast.
+- Load More continues the same palette sequence, while the consequential and surprise sections use separate non-colliding ranges.
 
 - A calmer four-pass taste interview: 12 broad opening choices, a tailored follow-up, subjects, then names and specifics.
 - A new Philanthropy + Community lane emphasizes beneficiaries, measurable results and money put to genuine public use.
