@@ -219,3 +219,29 @@
 /* V10: measured headline fitting may remove subordinate copy, never title text. */
 .tetrisCluster .fit-tight .tileBody p,.tetrisCluster .fit-tight .controls{display:none!important}
 .tetrisCluster .fit-tight .meta{margin-top:6px}.tetrisCluster .tile-video .tileBody{max-height:100%;overflow:hidden}
+
+/* V5: the same Better Start system, art-directed for the reader's strongest world. */
+.shell[class*="identity-"]{--identity-accent:var(--blue)}
+.identity-fashion{--paper:#f6f4ef;--card:#fff;--line:#c8c5bd;--identity-accent:#1267d6;background:#f6f4ef}
+.identity-fashion .mast{border-bottom-width:2px}.identity-fashion .brand{font-family:"DM Sans",sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:17px}
+.identity-fashion .editionFingerprint{background:#fff;border-color:#111}.identity-fashion .editionFingerprint>b{color:#111;letter-spacing:.16em}.identity-fashion .editionFingerprint span{border-radius:0;background:#111;color:#fff;border:0}
+.identity-fashion .hello h1{font-family:"DM Serif Display",serif;font-weight:400;letter-spacing:-.07em}.identity-fashion .helloAside span{max-width:430px}
+.identity-fashion .wallHead{border-top:2px solid #111}.identity-fashion .wallHead span{color:#1267d6}.identity-fashion .sectionHead h2{font-family:"DM Sans",sans-serif;text-transform:uppercase;letter-spacing:-.055em}
+.identity-fashion .favorite{background:#fff;color:#111;box-shadow:none;border-color:#111}.identity-fashion .favorite:nth-child(n){background:#fff}.identity-fashion .favorite:nth-child(3n+2){background:#111;color:#fff}.identity-fashion .favorite b{color:#1267d6}
+.identity-fashion .cat-fashion-style,.identity-fashion .cat-international-fashion,.identity-fashion .cat-fashion-photography,.identity-fashion .cat-fashion-history,.identity-fashion .cat-italian-style,.identity-fashion .cat-costume-screen,.identity-fashion .cat-fashion-culture,.identity-fashion .cat-women-style,.identity-fashion .cat-fashion-inside,.identity-fashion .cat-fashion-image,.identity-fashion .cat-fashion-s-next,.identity-fashion .cat-fashion-ideas,.identity-fashion .cat-runway-campaigns,.identity-fashion .cat-fashion-film,.identity-fashion .cat-magazines-style,.identity-fashion .cat-women-ideas,.identity-fashion .cat-women-s-sports,.identity-fashion .cat-women-s-tennis,.identity-fashion .cat-women-arts,.identity-fashion .cat-women-books,.identity-fashion .cat-books-people{--accent:#111}
+.identity-fashion .tetrisCluster .tile{box-shadow:none;border-color:#111}.identity-fashion .tetrisCluster .tile-text-art{background:#fff;border-color:#111}.identity-fashion .tile-text-art:before,.identity-fashion .tile-text-art:after{display:none}
+.identity-fashion .tetrisCluster .tile-text-art:nth-child(4n+2){background:#111;color:#fff}.identity-fashion .tetrisCluster .tile-text-art:nth-child(4n+2) h3,.identity-fashion .tetrisCluster .tile-text-art:nth-child(4n+2) .kicker,.identity-fashion .tetrisCluster .tile-text-art:nth-child(4n+2) .meta{color:#fff}
+.identity-fashion .tetrisCluster .tile-text-art:nth-child(7n){background:#1267d6;color:#fff}.identity-fashion .tetrisCluster .tile-text-art:nth-child(7n) h3,.identity-fashion .tetrisCluster .tile-text-art:nth-child(7n) .kicker,.identity-fashion .tetrisCluster .tile-text-art:nth-child(7n) .meta{color:#fff}
+.identity-fashion .galleryBatch:first-child .tetrisCluster:first-child .tile:first-child .imageLink{flex-basis:68%}.identity-fashion .galleryBatch:first-child .tetrisCluster:first-child .tile:first-child h3{font-family:"DM Sans",sans-serif;font-weight:500;letter-spacing:-.055em}
+.identity-fashion .tile-has-image .imageLink img{filter:saturate(.9) contrast(1.02)}
+.identity-fashion .important{background:#111;border-top-color:#1267d6}.identity-fashion .importantIntro>span{color:#71afff}
+
+.identity-sports{--identity-accent:#e4402e}.identity-sports .wallHead{border-color:#e4402e}.identity-sports .sectionHead h2{font-weight:800;text-transform:uppercase}.identity-sports .tetrisCluster .tile-text-art{background:linear-gradient(150deg,#fff 0 70%,#eef1f3 70%)}
+.identity-business{--identity-accent:#174f3a}.identity-business .hello h1{font-family:"DM Serif Display",serif;font-weight:400}.identity-business .wallHead{border-color:#174f3a}.identity-business .tetrisCluster .tile{box-shadow:none}
+.identity-outdoors{--identity-accent:#406b47}.identity-outdoors .wallHead{border-color:#406b47}.identity-outdoors .tetrisCluster .tile-has-image img{filter:saturate(.86) contrast(1.04)}
+.identity-food{--identity-accent:#d96a26}.identity-food .wallHead{border-color:#d96a26}.identity-food .tetrisCluster .tile-has-image img{filter:saturate(1.08)}
+.identity-arts{--identity-accent:#2457b8}.identity-arts .wallHead{border-color:#2457b8}.identity-arts .tetrisCluster .tile:nth-child(3n) h3{font-style:italic}
+.identity-science{--identity-accent:#277448}.identity-science .wallHead{border-color:#277448}.identity-science .tetrisCluster .tile-text-art{background:linear-gradient(145deg,#f8fbf7,#dcecdf)}
+.identity-making{--identity-accent:#9b5a29}.identity-making .wallHead{border-color:#9b5a29}.identity-books{--identity-accent:#765526}.identity-books .wallHead{border-color:#765526}.identity-books .tetrisCluster .tile h3{font-family:"DM Serif Display",serif}
+
+@media(max-width:650px){.identity-fashion .brand{font-size:14px}.identity-fashion .galleryBatch:first-child .tetrisCluster:first-child .tile:first-child .imageLink{flex-basis:auto}.identity-fashion .favorite:nth-child(n){background:#fff;color:#111}.identity-fashion .favorite:nth-child(3n+2){background:#111;color:#fff}}

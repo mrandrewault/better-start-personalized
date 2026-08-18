@@ -1,8 +1,17 @@
-# Better Start Personalized — V4
+# Better Start Personalized — V5
 
 This version makes personal editions meaningfully different by expanding the actual source pool behind each one.
 
-## New in V4
+## New in V5
+
+- An editorial identity engine gives fashion, sports, business, outdoors, food, arts, science, books and making-focused editions their own publication logic.
+- Fashion-led editions use a restrained cream, black and seasonal-accent system inspired by independent fashion magazines—not default pink.
+- The fashion opening is image-first and reserves its lead frames for relevant fashion, portrait, runway, costume, book and culture imagery.
+- Missing RSS artwork is recovered from article Open Graph metadata for a controlled set of high-value specialist stories.
+- Fashion editions block BMI, weight-loss, body-fat and appearance-anxiety stories, plus distressing animal imagery, from their main composition.
+- The women-writers bench now spans major fiction, international voices, essays, poetry, thrillers, speculative fiction and fantasy.
+- New source packs cover outdoors, food and travel, arts and performance, and science and technology.
+- Editorial-reference data documents the visual and editorial worlds guiding every identity, so those desks can deepen over time.
 
 - Fashion-literate prompts covering Fashion Week, Bergdorf’s, Le Bon Marché, runway collecting and production design.
 - Deep choices for fashion insiders, independent press, boutique labels, vintage runway, department stores and emerging designers.
@@ -35,7 +44,7 @@ This version makes personal editions meaningfully different by expanding the act
 
 ## Login-free deployment
 
-1. Create a new GitHub repository named `better-start-personalized-4`.
+1. Create a new GitHub repository named `better-start-personalized-5`.
 2. Upload the **contents** of this folder.
 3. In Vercel choose **Add New → Project** and import that repository.
 4. Leave the defaults unchanged and click **Deploy**.

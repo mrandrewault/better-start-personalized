@@ -60,8 +60,12 @@
       {"name":"Women’s Running","url":"https://news.google.com/rss/search?q=%28site%3Awomensrunning.com+OR+site%3Awomensrunning.co.uk%29+running+training+joy+profile+-politics&hl=en-US&gl=US&ceid=US:en","section":"RUNNING + WELLBEING","quality":9},
       {"name":"Pilates + Movement","url":"https://news.google.com/rss/search?q=pilates+movement+studio+teacher+wellbeing+retreat+-politics&hl=en-US&gl=US&ceid=US:en","section":"PILATES + WELLBEING","quality":9},
       {"name":"Beauty as Craft","url":"https://news.google.com/rss/search?q=cosmetics+beauty+founder+formulation+design+history+craft+-politics&hl=en-US&gl=US&ceid=US:en","section":"BEAUTY + CRAFT","quality":9},
-      {"name":"Women Writers","url":"https://news.google.com/rss/search?q=women+author+novelist+interview+new+book+Ann+Patchett+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOOKS + PEOPLE","quality":10},
-      {"name":"Women’s Bookshelf","url":"https://news.google.com/rss/search?q=%28Elin+Hilderbrand+OR+Emily+Henry+OR+Taylor+Jenkins+Reid+OR+Kristin+Hannah+OR+Brit+Bennett+OR+Celeste+Ng%29+book+author+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"WOMEN + BOOKS","quality":10},
+      {"name":"Women Writers","url":"https://news.google.com/rss/search?q=%28Margaret+Atwood+OR+Chimamanda+Ngozi+Adichie+OR+Zadie+Smith+OR+Elena+Ferrante+OR+Sally+Rooney+OR+Barbara+Kingsolver%29+author+book+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOOKS + PEOPLE","quality":11},
+      {"name":"Women’s Bookshelf","url":"https://news.google.com/rss/search?q=%28Elin+Hilderbrand+OR+Ann+Patchett+OR+Donna+Tartt+OR+Jhumpa+Lahiri+OR+Celeste+Ng+OR+Elizabeth+Strout%29+book+author+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"WOMEN + BOOKS","quality":11},
+      {"name":"International Women Writers","url":"https://news.google.com/rss/search?q=%28Han+Kang+OR+Claire+Keegan+OR+Maggie+O%27Farrell+OR+Edwidge+Danticat+OR+Rachel+Cusk+OR+Banana+Yoshimoto+OR+Sayaka+Murata%29+book+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOOKS + WORLD","quality":11},
+      {"name":"Edge Voices","url":"https://news.google.com/rss/search?q=%28Ottessa+Moshfegh+OR+Rachel+Kushner+OR+Carmen+Maria+Machado+OR+Ling+Ma+OR+Sigrid+Nunez+OR+Taffy+Brodesser-Akner%29+author+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"FICTION + IDEAS","quality":10},
+      {"name":"Essays + Public Minds","url":"https://news.google.com/rss/search?q=%28Claudia+Rankine+OR+Roxane+Gay+OR+Rebecca+Solnit+OR+Maggie+Nelson+OR+Leslie+Jamison+OR+Natasha+Trethewey%29+essay+author+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"ESSAYS + IDEAS","quality":10},
+      {"name":"Speculative Women","url":"https://news.google.com/rss/search?q=%28N.K.+Jemisin+OR+Susanna+Clarke+OR+Martha+Wells+OR+Naomi+Alderman+OR+V.E.+Schwab+OR+Nnedi+Okorafor+OR+Leigh+Bardugo%29+book+author+-politics&hl=en-US&gl=US&ceid=US:en","section":"SPECULATIVE + BOOKS","quality":10},
       {"name":"The Reading Edit","url":"https://news.google.com/rss/search?q=%28Reese%27s+Book+Club+OR+Read+with+Jenna+OR+Service95+Book+Club%29+new+pick+author+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOOK CLUB + CULTURE","quality":9},
       {"name":"Women in the Arts","url":"https://news.google.com/rss/search?q=woman+artist+photographer+architect+designer+exhibition+retrospective+-politics&hl=en-US&gl=US&ceid=US:en","section":"WOMEN + ARTS","quality":10}
     ]
@@ -111,6 +115,55 @@
       {"name":"Sailing Life","url":"https://news.google.com/rss/search?q=sailing+sailboat+cruising+restoration+maritime+beautiful+-politics&hl=en-US&gl=US&ceid=US:en","section":"SAILING + WATER","quality":9},
       {"name":"Boatbuilding Craft","url":"https://news.google.com/rss/search?q=boatbuilding+wooden+boat+restoration+craft+launch+-politics&hl=en-US&gl=US&ceid=US:en","section":"BOATS + CRAFT","quality":9},
       {"name":"Rail + Aviation","url":"https://news.google.com/rss/search?q=train+aviation+design+history+restoration+museum+-politics+-crash&hl=en-US&gl=US&ceid=US:en","section":"TRANSPORT + DESIGN","quality":8}
+    ]
+  },
+  {
+    "id":"outdoors",
+    "label":"Outside + In The Field",
+    "signals":["outdoors","hiking","camping","climbing","wildlife","nature","birding","skiing","surfing","national parks","conservation"],
+    "sources":[
+      {"name":"Adventure Journal","url":"https://news.google.com/rss/search?q=site%3Aadventure-journal.com+adventure+outdoors+photography+-politics&hl=en-US&gl=US&ceid=US:en","section":"OUTDOORS + CULTURE","quality":11},
+      {"name":"Field Mag","url":"https://news.google.com/rss/search?q=site%3Afieldmag.com+hiking+outdoors+cabin+photography+-politics&hl=en-US&gl=US&ceid=US:en","section":"FIELD + DESIGN","quality":11},
+      {"name":"Mountain Gazette","url":"https://news.google.com/rss/search?q=site%3Amountaingazette.com+mountain+ski+culture+photography+-politics&hl=en-US&gl=US&ceid=US:en","section":"MOUNTAIN + CULTURE","quality":10},
+      {"name":"bioGraphic","url":"https://news.google.com/rss/search?q=site%3Abiographic.com+wildlife+conservation+discovery+-politics&hl=en-US&gl=US&ceid=US:en","section":"NATURE + CONSERVATION","quality":11},
+      {"name":"Orion","url":"https://news.google.com/rss/search?q=site%3Aorionmagazine.org+nature+essay+place+-politics&hl=en-US&gl=US&ceid=US:en","section":"NATURE + IDEAS","quality":10}
+    ]
+  },
+  {
+    "id":"food-travel",
+    "label":"Food, Tables + Places",
+    "signals":["food","restaurant","cooking","recipe","chef","coffee","wine","travel","hotels","somewhere good to eat"],
+    "sources":[
+      {"name":"Saveur","url":"https://news.google.com/rss/search?q=site%3Asaveur.com+food+recipe+travel+tradition+-politics&hl=en-US&gl=US&ceid=US:en","section":"FOOD + CULTURE","quality":11},
+      {"name":"Eater","url":"https://www.eater.com/rss/index.xml","section":"FOOD + TRAVEL","quality":10},
+      {"name":"Serious Eats","url":"https://news.google.com/rss/search?q=site%3Aseriouseats.com+recipe+technique+food+-politics&hl=en-US&gl=US&ceid=US:en","section":"COOKING + HOW","quality":10},
+      {"name":"Cherry Bombe","url":"https://news.google.com/rss/search?q=site%3Acherrybombe.com+chef+food+women+interview+-politics&hl=en-US&gl=US&ceid=US:en","section":"FOOD + PEOPLE","quality":10},
+      {"name":"Culinary Backstreets","url":"https://news.google.com/rss/search?q=site%3Aculinarybackstreets.com+food+neighborhood+travel+-politics&hl=en-US&gl=US&ceid=US:en","section":"FOOD + PLACES","quality":11},
+      {"name":"AFAR","url":"https://news.google.com/rss/search?q=site%3Aafar.com+travel+culture+hotel+food+-politics&hl=en-US&gl=US&ceid=US:en","section":"TRAVEL + CULTURE","quality":10}
+    ]
+  },
+  {
+    "id":"arts-culture",
+    "label":"Art, Performance + Image",
+    "signals":["art","museum","painting","photography","theater","dance","opera","performance","graphic design","creative"],
+    "sources":[
+      {"name":"Frieze","url":"https://news.google.com/rss/search?q=site%3Afrieze.com+artist+exhibition+museum+-politics&hl=en-US&gl=US&ceid=US:en","section":"ART + IDEAS","quality":11},
+      {"name":"Aperture","url":"https://news.google.com/rss/search?q=site%3Aaperture.org+photography+photographer+book+exhibition+-politics&hl=en-US&gl=US&ceid=US:en","section":"PHOTOGRAPHY","quality":11},
+      {"name":"Colossal","url":"https://www.thisiscolossal.com/feed/","section":"ART + DESIGN","quality":10},
+      {"name":"BOMB Magazine","url":"https://news.google.com/rss/search?q=site%3Abombmagazine.org+artist+interview+studio+-politics&hl=en-US&gl=US&ceid=US:en","section":"ARTISTS + VOICES","quality":10},
+      {"name":"Performing Arts","url":"https://news.google.com/rss/search?q=%28site%3Aplaybill.com+OR+site%3Adancemagazine.com+OR+site%3Aoperawire.com%29+performance+artist+new+-politics&hl=en-US&gl=US&ceid=US:en","section":"PERFORMING ARTS","quality":10}
+    ]
+  },
+  {
+    "id":"science-tech",
+    "label":"Science, Nature + How Things Work",
+    "signals":["science","how things work","technology","engineering","space","astronomy","research","invention"],
+    "sources":[
+      {"name":"Quanta","url":"https://api.quantamagazine.org/feed/","section":"SCIENCE + IDEAS","quality":11},
+      {"name":"Nautilus","url":"https://nautil.us/feed/","section":"SCIENCE + CULTURE","quality":11},
+      {"name":"Knowable","url":"https://knowablemagazine.org/rss","section":"SCIENCE + EXPLAINED","quality":10},
+      {"name":"NASA","url":"https://www.nasa.gov/rss/dyn/breaking_news.rss","section":"SCIENCE + NATURE","quality":11},
+      {"name":"MIT Technology Review","url":"https://news.google.com/rss/search?q=site%3Atechnologyreview.com+innovation+science+design+-politics&hl=en-US&gl=US&ceid=US:en","section":"TECHNOLOGY + IDEAS","quality":10}
     ]
   }
 ]

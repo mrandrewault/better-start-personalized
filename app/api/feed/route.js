@@ -39,7 +39,7 @@ function imageFor(item) {
     html.match(/<img[^>]+(?:data-lazy-src|data-src|src)=["']([^"']+)/i)?.[1],
     html.match(/<img[^>]+srcset=["']([^"' ,]+)/i)?.[1]
   ].filter(Boolean);
-  return candidates.find(url => !/pixel|spacer|tracking|1x1|blank\.(gif|png)/i.test(url)) || null;
+  return candidates.find(url => !/pixel|spacer|tracking|1x1|blank\.(gif|png)|lh3\.googleusercontent\.com\/J6_coFbogx/i.test(url)) || null;
 }
 function itemText(item) { return `${item.title || ""} ${item.contentSnippet || ""} ${item.content || ""}`.toLowerCase(); }
 function isDisallowed(item) {
@@ -56,6 +56,46 @@ function isJoyful(item) {
 function isSpecialistWorthwhile(item) {
   const value = `${item.title || ""} ${item.summary || ""}`;
   return /profile|interview|explainer|guide|design|history|archive|craft|studio|maker|founder|leader|company|business|market|finance|style|fashion|couture|runway|atelier|collection|costume|wardrobe|beauty|cosmetic|photographer|supermodel|book|author|novelist|library|museum|yoga|pilates|movement|wellness|fitness|running|garden|plant|workshop|repair|restor|car|automotive|boat|sail|maritime|train|aviation|team|player|wnba|baseball|tennis|football|soccer/i.test(value) && !hasBadMood(value);
+}
+const bodyAnxiety = /\b(bmi|body fat|weight loss|lose weight|obesity|overweight|fat burning|belly fat|calorie deficit|dieting|slim down|beach body|anti-aging)\b/i;
+const distressedAnimal = /\b(abuse|abandoned|starving|dying|near death|neglect|euthan|dumped|injured|horrific|suffering|thousands of miles away)\b/i;
+function detectEditorialIdentity(interests, activePacks) {
+  const identities = load("editorial-identities.json"), haystack = ` ${interests.join(" ").toLowerCase()} `;
+  const ranked = Object.entries(identities).map(([id, identity]) => {
+    const signalHits = identity.signals.reduce((total, signal) => total + (haystack.includes(signal) ? 1 : 0), 0);
+    const packHits = activePacks.reduce((total, pack) => total + (identity.packs.includes(pack.id) ? pack.hits : 0), 0);
+    return {id, ...identity, score:signalHits * 3 + packHits * 2};
+  }).filter(identity => identity.score > 0).sort((a, b) => b.score - a.score);
+  return ranked[0] || {id:"general", label:"Better Start Reader", references:[], accent:"classic", imageTarget:.52, score:0};
+}
+function contextAllowed(item, identity) {
+  const value = `${item.title || ""} ${item.summary || ""}`;
+  if (identity.id === "fashion" && (bodyAnxiety.test(value) || distressedAnimal.test(value))) return false;
+  if (identity.id === "sports" && /\b(odds|betting|sportsbook|parlay|wager)\b/i.test(value)) return false;
+  return true;
+}
+function isIdentityStory(item, identity) {
+  if (identity.id === "general") return item.personalFit !== "editorial";
+  return identity.packs.includes(item.sourcePack) || identity.signals.some(signal => policyText(`${item.title} ${item.summary} ${item.section} ${item.source}`).includes(policyText(signal)));
+}
+async function enrichStoryImage(item) {
+  if (item.image || !item.url || item.url === "#") return item;
+  try {
+    const response = await fetch(item.url, {redirect:"follow", headers:{"User-Agent":"Mozilla/5.0 BetterStart/5.0"}, signal:AbortSignal.timeout(2800)});
+    if (!response.ok) return item;
+    const html = await response.text();
+    const image = html.match(/<meta[^>]+property=["']og:image(?::url)?["'][^>]+content=["']([^"']+)/i)?.[1]
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::url)?["']/i)?.[1]
+      || html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)/i)?.[1];
+    return image && /^https?:/i.test(image) && !/lh3\.googleusercontent\.com\/J6_coFbogx|news\.google\.com/i.test(image) ? {...item, image, format:"visual", imageEnriched:true} : item;
+  } catch { return item; }
+}
+async function enrichIdentityImages(items, identity) {
+  if (identity.id === "general") return items;
+  const candidates = items.filter(item => !item.image && isIdentityStory(item, identity)).slice(0, 24);
+  if (!candidates.length) return items;
+  const enriched = await Promise.all(candidates.map(enrichStoryImage)), byUrl = new Map(enriched.map(item => [item.url, item]));
+  return items.map(item => byUrl.get(item.url) || item);
 }
 function isFreshLocal(item) {
   if (!item.date) return true;
@@ -192,7 +232,7 @@ async function loadReaderVideos(avoid = new Set()) {
 
 export async function GET(request) {
   const params = new URL(request.url).searchParams, random = seededRandom(params.get("visit") || String(Math.floor(Date.now() / 72e5))), avoidVideos = new Set((params.get("avoid") || "").split(",").filter(Boolean)), localPlaces = (params.get("places") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 20), interests = (params.get("interests") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 48);
-  const taste = load("taste.json"), baseSources = load("sources.json"), activePacks = activateSourcePacks(interests, load("source-packs.json")), specialistSources = activePacks.flatMap(pack => pack.sources.map(source => ({...source, pack:pack.id, packLabel:pack.label, packHits:pack.hits}))), sources = [...baseSources, ...specialistSources];
+  const taste = load("taste.json"), baseSources = load("sources.json"), activePacks = activateSourcePacks(interests, load("source-packs.json")), editorialIdentity = detectEditorialIdentity(interests, activePacks), specialistSources = activePacks.flatMap(pack => pack.sources.map(source => ({...source, pack:pack.id, packLabel:pack.label, packHits:pack.hits}))), sources = [...baseSources, ...specialistSources];
   const results = await Promise.allSettled(sources.map(async source => {
     const feed = await parser.parseURL(source.url);
     return (feed.items || []).slice(0, 40).map((item, index) => {
@@ -203,7 +243,8 @@ export async function GET(request) {
   }));
   let all = [];
   results.forEach(result => { if (result.status === "fulfilled") all.push(...result.value); });
-  all = unique(all.filter(item => item.score > 18 && !isDisallowed(item) && (isJoyful(item) || (item.sourcePack && isSpecialistWorthwhile(item))) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
+  all = unique(all.filter(item => item.score > 18 && !isDisallowed(item) && contextAllowed(item, editorialIdentity) && (isJoyful(item) || (item.sourcePack && isSpecialistWorthwhile(item))) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
+  all = await enrichIdentityImages(all, editorialIdentity);
 
   // One shared registry across every page region makes duplicates impossible.
   const usedUrls = new Set(), usedTitles = new Set();
@@ -218,8 +259,8 @@ export async function GET(request) {
   const favoriteSelection = claim(compose(brightPool.filter(item => !usedUrls.has(canonicalUrl(item.url))), 6, {}, random));
   const goodNews = claim(compose(all.filter(isGoodNews), 1, {}, random))[0] || null;
   const videoPool = (await loadReaderVideos(avoidVideos)).map(item => personalize(item, interests));
-  const fashionFocus = activePacks.some(pack => ["fashion-style","women-culture"].includes(pack.id) && pack.hits >= 2);
-  const focusMediaSignal = /fashion|runway|couture|designer|costume|wardrobe|atelier|supermodel|vogue|magazine|beauty|women|woman|female|wnba|tennis|pilates|yoga|wellness|author|novelist|book club/i;
+  const fashionFocus = editorialIdentity.id === "fashion";
+  const focusMediaSignal = /fashion|runway|couture|designer|costume|wardrobe|atelier|supermodel|vogue|editorial photography|fashion photography|style archive|fashion week|women.?s tennis|wnba|author interview|novelist|book club/i;
   const relevantMedia = videoPool.filter(item => item.personalFit !== "editorial" && (!fashionFocus || focusMediaSignal.test(`${item.title} ${item.summary} ${item.section}`)));
   // A strongly signaled fashion/women's edition never gets padded with
   // unrelated generic videos just because those thumbnails are available.
@@ -247,10 +288,22 @@ export async function GET(request) {
       personalizedPool.push(...focus.splice(0, fashionFocus ? 11 : 7), ...direct.splice(0, fashionFocus ? 5 : 8), ...adjacent.splice(0, 3), ...editorial.splice(0, fashionFocus ? 1 : 2));
     }
     const backfill = galleryPool.filter(item => !new Set(personalizedPool.map(story => canonicalUrl(story.url))).has(canonicalUrl(item.url)));
-    gallery = claim([...personalizedPool, ...compose(backfill, 140 - personalizedPool.length, {}, random)].slice(0, 140));
+    const combined = [...personalizedPool, ...compose(backfill, 140 - personalizedPool.length, {}, random)].slice(0, 140);
+    const identityVisuals = combined.filter(item => item.image && isIdentityStory(item, editorialIdentity));
+    const identityText = combined.filter(item => !item.image && isIdentityStory(item, editorialIdentity));
+    const remaining = combined.filter(item => !isIdentityStory(item, editorialIdentity));
+    const opening = [], visualQueue = [...identityVisuals], textQueue = [...identityText], otherQueue = [...remaining];
+    while (opening.length < combined.length) {
+      if (visualQueue.length) opening.push(visualQueue.shift());
+      if (visualQueue.length) opening.push(visualQueue.shift());
+      if (textQueue.length) opening.push(textQueue.shift());
+      if (otherQueue.length && (opening.length > 18 || editorialIdentity.id !== "fashion")) opening.push(otherQueue.shift());
+      if (!visualQueue.length && !textQueue.length) opening.push(...otherQueue.splice(0));
+    }
+    gallery = claim(opening);
   } else gallery = claim(compose(galleryPool, 140, {}, random));
   const serendipityPool = all.filter(item => item.noHits === 0 && !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   const serendipity = claim(compose(serendipityPool, 60, {}, random));
 
-  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, composition:fashionFocus?{direct:80,adjacent:12,editorial:8}:{direct:65,adjacent:20,editorial:15}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
+  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, editorialIdentity:{id:editorialIdentity.id,label:editorialIdentity.label,accent:editorialIdentity.accent,references:editorialIdentity.references,imageTarget:editorialIdentity.imageTarget}, composition:fashionFocus?{direct:80,adjacent:12,editorial:8}:{direct:65,adjacent:20,editorial:15}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
 }
