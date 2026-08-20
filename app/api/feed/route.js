@@ -258,6 +258,144 @@ function unique(items) {
   }
   return output;
 }
+const normalizeSource = value => String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+const BALANCED_MAGAZINE_RECIPE = [
+  "arts",
+  "animals",
+  "international",
+  "kindness",
+  "ingenuity",
+  "fashion",
+  "fashion",
+  "music",
+  "science",
+  "science",
+  "travel",
+  "travel",
+  "food",
+  "food",
+  "sports",
+  "money",
+  "technology",
+  "home",
+  "grabBag",
+  "grabBag",
+];
+
+const BALANCED_MAGAZINE_COUNTS = {
+  arts: 1,
+  animals: 1,
+  international: 1,
+  kindness: 1,
+  ingenuity: 1,
+  fashion: 2,
+  music: 1,
+  science: 2,
+  travel: 2,
+  food: 2,
+  sports: 1,
+  money: 1,
+  technology: 1,
+  home: 1,
+  grabBag: 2,
+};
+
+const MIX_LABELS = {
+  arts:"Arts", animals:"Animals", international:"International", kindness:"Human kindness",
+  ingenuity:"Human ingenuity", fashion:"Fashion", music:"Music", science:"Science",
+  travel:"Travel", food:"Food", sports:"Sports", money:"Money + business",
+  technology:"Technology + innovation", home:"Home, gardens + design", grabBag:"Lively grab bag"
+};
+
+// Classify the subject, never the presentation format. A photograph of Kyoto
+// is travel; a photographed recipe is food; only art-about-art belongs in arts.
+function contentLane(item) {
+  const text = `${item?.title || ""} ${item?.summary || ""} ${item?.section || ""} ${item?.source || ""} ${item?.sourcePackLabel || ""}`.toLowerCase();
+  const matches = (pattern) => pattern.test(text);
+  if (matches(/\b(food|restaurant|recipe|cook|chef|dining|bakery|coffee|wine|cocktail|kitchen|cuisine|ingredient)/)) return "food";
+  if (matches(/\b(travel|trip|journey|hotel|destination|tourism|vacation|flight|airline|city guide|weekend getaway|road trip)/)) return "travel";
+  if (matches(/\b(fashion|style|runway|couture|designer|wardrobe|costume|atelier|textile|garment|vogue|menswear|womenswear)/)) return "fashion";
+  if (matches(/\b(sport|baseball|football|basketball|tennis|soccer|golf|running|cycling|athlete|yankees|twins|giants|wnba|mlb|nfl|nba)/)) return "sports";
+  if (matches(/\b(animal|dog|cat|wildlife|bird|pet|rescue|zoo|habitat|species|creature)/)) return "animals";
+  if (matches(/\b(music|album|song|singer|band|jazz|record|concert|composer|synth|guitar|piano|orchestra)/)) return "music";
+  if (matches(/\b(home|house|interior|garden|diy|renovation|furniture|decor|woodwork|craft|repair)/)) return "home";
+  if (matches(/\b(technology|tech|robot|software|hardware|digital|computer|apple|iphone|mac|artificial intelligence|\bai\b)/)) return "technology";
+  if (matches(/\b(science|scientist|space|nasa|astronom|physics|biology|chemistry|research|planet|fossil|nature|ecology)/)) return "science";
+  if (matches(/\b(money|finance|financial|business|market|invest|economy|company|founder|entrepreneur|small business)/)) return "money";
+  if (matches(/\b(kindness|volunteer|philanthrop|donat|charity|community|neighbor|mutual aid|generosity)/)) return "kindness";
+  if (matches(/\b(invent|engineer|breakthrough|maker|discovery|create|build|restore|solution|achievement|ingenuity)/)) return "ingenuity";
+  if (matches(/\b(international|world|global|europe|asia|africa|paris|london|japan|italy|france|spain|canada|denmark|sweden|greece|india|australia)/)) return "international";
+  if (matches(/\b(art|artist|museum|gallery|photograph|architecture|theat(?:er|re)|dance|film|cinema|sculpt|paint)/)) return "arts";
+  return "grabBag";
+}
+
+function personalizedCounts(interests = []) {
+  const counts = {...BALANCED_MAGAZINE_COUNTS};
+  const signals = interests.map(value => contentLane({title:value})).filter(lane => lane !== "grabBag");
+  const boosts = [...new Set(signals)].slice(0, 3);
+  boosts.forEach(lane => {
+    const desired = Math.min(5, counts[lane] + (boosts.length === 1 ? 3 : 2));
+    let needed = desired - counts[lane];
+    for (const donor of ["grabBag", "science", "travel", "food", "fashion", "arts", "animals", "international", "kindness", "ingenuity", "music", "sports", "money", "technology", "home"]) {
+      if (!needed || donor === lane || boosts.includes(donor)) continue;
+      const available = Math.max(0, counts[donor] - 1);
+      const moved = Math.min(needed, available);
+      counts[donor] -= moved; counts[lane] += moved; needed -= moved;
+    }
+  });
+  return counts;
+}
+
+function balancedMagazine(candidates, count, interests = [], random = Math.random) {
+  const remaining = unique(candidates).map((item) => ({ ...item, mixLane: contentLane(item) }));
+  const selected = [];
+  const sourceCounts = new Map();
+  const targets = interests.length ? personalizedCounts(interests) : BALANCED_MAGAZINE_COUNTS;
+  let visualArtCount = 0;
+
+  for (let position = 0; position < count && remaining.length; position += 1) {
+    const blockPosition = position % 20;
+    const blockCounts = Object.fromEntries(Object.keys(targets).map(lane => [lane, selected.slice(position - blockPosition).filter(item => item.mixLane === lane).length]));
+    const recentLanes = selected.slice(-2).map(item => item.mixLane);
+    const lane = Object.keys(targets)
+      .filter(candidate => !recentLanes.includes(candidate) && remaining.some(item => item.mixLane === candidate))
+      .sort((a,b) => (targets[b] - blockCounts[b]) - (targets[a] - blockCounts[a]))[0]
+      || Object.keys(targets).find(candidate => remaining.some(item => item.mixLane === candidate))
+      || "grabBag";
+    const exact = remaining.filter((item) => item.mixLane === lane);
+    const eligible = exact.length ? exact : remaining;
+    const recentSources = new Set(selected.slice(-4).map((item) => normalizeSource(item.source)));
+
+    const ranked = eligible
+      .map((item) => {
+        const source = normalizeSource(item.source);
+        const isVisualShelf = Boolean(item.visualShelf) || /visual shelf/i.test(item.source || "");
+        let score = Number(item.score || 0) + random() * 8;
+        if (item.mixLane === lane) score += 45;
+        if (item.image) score += 22;
+        if (item.personalFit === "direct") score += 25;
+        if (item.personalFit === "adjacent") score += 10;
+        score -= (sourceCounts.get(source) || 0) * 22;
+        if (recentSources.has(source)) score -= 80;
+        if (recentLanes.includes(item.mixLane)) score -= 50;
+        if (isVisualShelf && item.mixLane === "arts" && visualArtCount >= 2 && position < 20) score -= 10000;
+        return { item, score, isVisualShelf };
+      })
+      .sort((a, b) => b.score - a.score);
+
+    const winner = ranked[0];
+    if (!winner) break;
+    const index = remaining.indexOf(winner.item);
+    remaining.splice(index, 1);
+    const source = normalizeSource(winner.item.source);
+    sourceCounts.set(source, (sourceCounts.get(source) || 0) + 1);
+    if (winner.isVisualShelf && winner.item.mixLane === "arts") visualArtCount += 1;
+    selected.push({ ...winner.item, mixLabel:MIX_LABELS[winner.item.mixLane] });
+  }
+
+  return selected;
+}
 
 // A greedy magazine editor: every choice is judged by how much it improves the
 // current page, with diminishing returns for repeated sources/topics/formats.
@@ -356,7 +494,10 @@ export async function GET(request) {
   // A strongly signaled fashion/women's edition never gets padded with
   // unrelated generic videos just because those thumbnails are available.
   const mediaPool = fashionFocus ? relevantMedia : [...relevantMedia, ...videoPool.filter(item => item.personalFit === "editorial").slice(0, 5)];
-  const media = claim(compose(mediaPool, 20, {}, random));
+  // Playable media competes for the same subject slots as every other story.
+  // Keeping it in a separate stream would quietly turn format into category.
+  const mediaCandidates = compose(mediaPool, 24, {}, random);
+  const media = [];
   const importantPool = all.filter(item => ["NASA", "Guardian Science", "Science Breakthroughs", "Technology for Good", "Nature Restored"].includes(item.source));
   const important = claim(compose(importantPool, 3, {}, random));
   if (important.length < 3) {
@@ -379,43 +520,19 @@ export async function GET(request) {
   reserveSerendipity(unusedStories().filter(item => item.personalFit === "adjacent"));
   reserveSerendipity(unusedStories());
 
-  const galleryPool = all.filter(item => !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
-  let gallery;
-  if (interests.length) {
-    const focusIds = new Set(fashionFocus ? ["fashion-style","women-culture"] : activePacks.slice(0,2).map(pack => pack.id));
-    const focus = compose(galleryPool.filter(item => focusIds.has(item.sourcePack)), fashionFocus ? 78 : 45, {}, random);
-    const focusKeys = new Set(focus.map(item => canonicalUrl(item.url)));
-    const direct = compose(galleryPool.filter(item => item.personalFit === "direct" && !focusKeys.has(canonicalUrl(item.url))), fashionFocus ? 34 : 65, {}, random);
-    const directKeys = new Set(direct.map(item => canonicalUrl(item.url)));
-    const adjacent = compose(galleryPool.filter(item => item.personalFit === "adjacent" && !focusKeys.has(canonicalUrl(item.url)) && !directKeys.has(canonicalUrl(item.url))), fashionFocus ? 17 : 28, {}, random);
-    const selectedKeys = new Set([...focus, ...direct, ...adjacent].map(item => canonicalUrl(item.url)));
-    const editorial = compose(galleryPool.filter(item => !selectedKeys.has(canonicalUrl(item.url))), fashionFocus ? 11 : 21, {}, random);
-    const personalizedPool = [];
-    while (focus.length || direct.length || adjacent.length || editorial.length) {
-      personalizedPool.push(...focus.splice(0, fashionFocus ? 11 : 7), ...direct.splice(0, fashionFocus ? 5 : 8), ...adjacent.splice(0, 3), ...editorial.splice(0, fashionFocus ? 1 : 2));
-    }
-    const backfill = galleryPool.filter(item => !new Set(personalizedPool.map(story => canonicalUrl(story.url))).has(canonicalUrl(item.url)));
-    const combined = [...personalizedPool, ...compose(backfill, 140 - personalizedPool.length, {}, random)].slice(0, 140);
-    const identityVisuals = combined.filter(item => item.image && isIdentityStory(item, editorialIdentity));
-    const identityText = combined.filter(item => !item.image && isIdentityStory(item, editorialIdentity));
-    const remaining = combined.filter(item => !isIdentityStory(item, editorialIdentity));
-    const opening = [], visualQueue = [...identityVisuals], textQueue = [...identityText], otherQueue = [...remaining];
-    while (opening.length < combined.length) {
-      if (visualQueue.length) opening.push(visualQueue.shift());
-      if (visualQueue.length) opening.push(visualQueue.shift());
-      if (textQueue.length) opening.push(textQueue.shift());
-      if (otherQueue.length && (opening.length > 18 || editorialIdentity.id !== "fashion")) opening.push(otherQueue.shift());
-      if (!visualQueue.length && !textQueue.length) opening.push(...otherQueue.splice(0));
-    }
-    gallery = claim(distributeVisuals(visualFirst(opening, editorialIdentity, 20, fashionFocus ? 14 : undefined), editorialIdentity));
-  } else gallery = claim(distributeVisuals(visualFirst(compose(galleryPool, 140, {}, random), editorialIdentity), editorialIdentity));
-  // If publishers still do not supply enough images, insert attributed,
-  // openly licensed standalone photography. These are honest visual features,
-  // never unrelated decorations attached to another story.
+  const galleryPool = [...all.filter(item => !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title))), ...mediaCandidates];
+  // Standalone photography enters the same subject-aware selection pool. Its
+  // topic is inferred from its subject; only genuinely art-led work counts as arts.
   const allVisualShelf = (await loadVisualShelf(editorialIdentity)).filter(item => !wasRecentlyShown(item, avoidStories));
-  const visualShelf = claim(allVisualShelf.slice(0, 56));
-  gallery = distributeVisuals([...gallery, ...visualShelf], editorialIdentity).slice(0, 140);
+  const magazinePool = [...galleryPool, ...allVisualShelf.slice(0, 56)];
+  const selectedMagazine = balancedMagazine(magazinePool, 140, interests, random);
+  // Preserve the editor's 20-story windows. The client may arrange cards
+  // inside each ten-card layout cluster, but no visual pass can import a later
+  // story and silently alter the opening subject mix.
+  const gallery = claim(selectedMagazine);
   const galleryKeys = new Set(gallery.map(item => canonicalUrl(item.url)));
   const visualReserve = allVisualShelf.slice(56).filter(item => !galleryKeys.has(canonicalUrl(item.url))).slice(0, 24).map(item => ({...item, canonicalUrl:canonicalUrl(item.url)}));
-  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, editorialIdentity:{id:editorialIdentity.id,label:editorialIdentity.label,accent:editorialIdentity.accent,references:editorialIdentity.references,imageTarget:editorialIdentity.imageTarget}, composition:fashionFocus?{direct:80,adjacent:12,editorial:8}:{direct:65,adjacent:20,editorial:15}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, visualReserve, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
+  const targetCounts = interests.length ? personalizedCounts(interests) : BALANCED_MAGAZINE_COUNTS;
+  const actualCounts = Object.fromEntries(Object.keys(BALANCED_MAGAZINE_COUNTS).map(lane => [lane, gallery.slice(0, 20).filter(item => item.mixLane === lane).length]));
+  return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, editorialIdentity:{id:editorialIdentity.id,label:editorialIdentity.label,accent:editorialIdentity.accent,references:editorialIdentity.references,imageTarget:editorialIdentity.imageTarget}, composition:{window:20,targetCounts,actualCounts,labels:MIX_LABELS}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, visualReserve, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
 }
