@@ -1,4 +1,13 @@
-# Meanwhile 20 — Generic + Personalization Editorial Mix
+# Meanwhile 21 — Balanced Variety Fix
+
+This revision fixes the rendered-feed photography flood found in Meanwhile 20.
+Good Stuff now receives the full editorial inventory before serendipity is
+reserved; visual-shelf cards are capped at two per 20-card window; individual
+publications are capped at two per window; and failed images fall back to an
+intentional text card instead of replacing the story with unrelated shelf
+photography. Generic editions also draw from a small set of specialist fashion,
+food, sports, business, making, science and community desks so the target mix
+has genuine reporting to choose from.
 
 This edition makes the subject mix a first-class editorial system. Every
 20-story window targets 5% arts, animals, international, human kindness, human

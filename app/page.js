@@ -210,13 +210,15 @@ function JoyTile({item, index}) {
     {item.joyType === "doodle" && <PocketEtch variant={item.variant} />}
   </article>;
 }
-function Story({item, fallbackItem, index, paletteIndex = index, palette, onRate, onSave, onShare, saved}) {
+function Story({item, index, paletteIndex = index, palette, onRate, onSave, onShare, saved}) {
   const tileRef = useRef(null);
   const [imageRejected, setImageRejected] = useState(false);
   const [playing, setPlaying] = useState(false);
   useEffect(() => { setImageRejected(false); setPlaying(false); }, [item.canonicalUrl]);
-  const replacement = imageRejected && fallbackItem ? fallbackItem : item;
-  const hasImage = !!replacement.image && !(imageRejected && !fallbackItem);
+  // A failed image changes the presentation, never the story. Replacing the
+  // entire card with visual-shelf photography would bypass the edition mix.
+  const replacement = item;
+  const hasImage = !!replacement.image && !imageRejected;
   const type = replacement.format || "article";
   const playable = type === "video" || type === "bandcamp";
   const playerUrl = type === "video" ? `https://www.youtube-nocookie.com/embed/${replacement.videoId}?autoplay=1&rel=0` : replacement.embedUrl;
@@ -334,7 +336,7 @@ export default function Home() {
 
     <section className="favoritesSection"><div className="sectionHead"><div><span>A few especially nice things</span><h2>Bright Spots</h2></div><p>Kindness, ingenuity & excellent dogs</p></div><div className="favorites">{uniqueFavorites.map(item => <a className="favorite" href={item.url} target="_blank" rel="noreferrer" key={item.canonicalUrl}><span>{age(item.date)}</span><h3>{item.title}</h3><b>{item.source}</b></a>)}</div></section>
 
-    <section className="gallerySection"><div className="sectionHead wallHead"><div><span>Every good magazine on the table</span><h2>Good Stuff</h2></div><p>{profile ? "Your interests, with the wider world left in" : "A deliberately broad, lively mix"}</p></div>{visibleBatches.length ? visibleBatches.map((batch, batchIndex) => <div className="galleryBatch" key={batchIndex}>{arrangeFrameClusters(batch).map((cluster, clusterIndex) => { const variant = (batchIndex * 3 + clusterIndex) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => { const absoluteIndex = batchIndex * BATCH_SIZE + clusterIndex * 10 + index; return item.format === "joy" ? <JoyTile item={item} index={absoluteIndex} key={item.canonicalUrl} /> : <Story item={item} fallbackItem={data?.visualReserve?.[absoluteIndex]} index={absoluteIndex} paletteIndex={absoluteIndex} palette={palette} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />; })}</div>; })}</div>) : <div className="loading"><span>Composing today&apos;s wall</span><i /><i /><i /></div>}
+    <section className="gallerySection"><div className="sectionHead wallHead"><div><span>Every good magazine on the table</span><h2>Good Stuff</h2></div><p>{profile ? "Your interests, with the wider world left in" : "A deliberately broad, lively mix"}</p></div>{visibleBatches.length ? visibleBatches.map((batch, batchIndex) => <div className="galleryBatch" key={batchIndex}>{arrangeFrameClusters(batch).map((cluster, clusterIndex) => { const variant = (batchIndex * 3 + clusterIndex) % 3; return <div className={`tetrisCluster clusterVariant-${variant} clusterCount-${cluster.length} ${cluster.length <= 5 ? "partialCluster" : ""}`} key={clusterIndex}>{cluster.map((item, index) => { const absoluteIndex = batchIndex * BATCH_SIZE + clusterIndex * 10 + index; return item.format === "joy" ? <JoyTile item={item} index={absoluteIndex} key={item.canonicalUrl} /> : <Story item={item} index={absoluteIndex} paletteIndex={absoluteIndex} palette={palette} onRate={rate} onSave={toggleSave} onShare={share} saved={savedKeys.has(itemKey(item))} key={item.canonicalUrl} />; })}</div>; })}</div>) : <div className="loading"><span>Composing today&apos;s wall</span><i /><i /><i /></div>}
       {batches * BATCH_SIZE < wall.length && <div className="loadWrap"><button className="loadBtn" onClick={() => setBatches(count => count + 1)}>Load 25 More Good Things<span>↓</span></button></div>}
     </section>
 
