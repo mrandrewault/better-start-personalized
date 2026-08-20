@@ -4,29 +4,18 @@ import path from "path";
 
 const parser = new Parser({
   timeout: 9000,
-  headers: {"User-Agent": "Upwards/2.0"},
+  headers: {"User-Agent": "BetterStart/2.0"},
   customFields: {item: [["media:content", "mediaContent"], ["media:thumbnail", "mediaThumbnail"]]}
 });
 const dataPath = name => path.join(process.cwd(), "data", name);
 const load = name => JSON.parse(fs.readFileSync(dataPath(name), "utf8"));
 const blockedTerms = Object.values(load("content-policy.json")).flat();
 const policyText = value => ` ${String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\s+/g, " ").trim()} `;
+const stableHash = value => { let hash = 2166136261; for (const char of String(value || "")) { hash ^= char.charCodeAt(0); hash = Math.imul(hash, 16777619); } return (hash >>> 0).toString(36); };
+const publicSpaceUnsafe = /\b(porn(?:ography|ographic)?|nsfw|nud(?:e|ity)|naked|topless|full[- ]?frontal|genitals?|penis|vulva|vagina|erotic(?:a)?|sexually explicit|adult content|figure stud(?:y|ies)|boudoir)\b/i;
 
 function plain(value = "") {
   return value.replace(/<[^>]+>/g, " ").replace(/&\w+;/g, " ").replace(/\s+/g, " ").trim();
-}
-function isEnglishText(value = "") {
-  const text = plain(value);
-  if (!text) return true;
-  const letters = text.match(/\p{L}/gu) || [];
-  if (!letters.length) return true;
-  const englishScriptLetters = text.match(/[A-Za-z]/g) || [];
-  // English headlines can contain accented names, but should not be primarily
-  // written in Arabic, Cyrillic, CJK or another non-English script.
-  return englishScriptLetters.length / letters.length >= 0.7;
-}
-function isEnglishItem(item) {
-  return isEnglishText(item.title) && isEnglishText(item.summary || item.contentSnippet || "");
 }
 function normalizeTitle(value = "") {
   return plain(value).toLowerCase().replace(/\b(the|a|an|and|or|but|to|of|for|in|on|at|with|from)\b/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
@@ -59,7 +48,11 @@ function isDisallowed(item) {
   const value = policyText(`${item.title || ""} ${item.summary || ""} ${item.contentSnippet || ""} ${item.source || ""} ${item.section || ""}`);
   const raw = `${item.title || ""} ${item.summary || ""} ${item.contentSnippet || ""} ${item.source || ""} ${item.section || ""}`;
   const corporateAmazon = /\bamazon(?:'s)?\b/i.test(raw) && !/\bamazon (?:rainforest|river|basin|forest|region|wildlife)\b/i.test(raw);
-  return corporateAmazon || /\bjeff bezos\b/i.test(raw) || bodyAnxiety.test(raw) || blockedTerms.some(term => value.includes(policyText(term)));
+  return corporateAmazon || /\bjeff bezos\b/i.test(raw) || bodyAnxiety.test(raw) || publicSpaceUnsafe.test(raw) || blockedTerms.some(term => value.includes(policyText(term)));
+}
+function wasRecentlyShown(item, avoidStories) {
+  if (!avoidStories?.size) return false;
+  return [canonicalUrl(item.url), `url:${canonicalUrl(item.url)}`, normalizeTitle(item.title), `title:${normalizeTitle(item.title)}`, item.image, `image:${item.image || ""}`, item.videoId, `video:${item.videoId || ""}`].filter(Boolean).some(value => avoidStories.has(stableHash(value)));
 }
 function hasBadMood(value) {
   return /killed|deadly|fatal|crash|unsafe|controvers|war|attack|crisis|disaster|outrage|scandal|cancer|dies?\b|death|threat|fear|horrific|tariffs?|banned|terrible|abuse|neglect|euthan|injur|defeat|worsen|\bworst\b/i.test(value);
@@ -81,7 +74,7 @@ function detectEditorialIdentity(interests, activePacks) {
     const packHits = activePacks.reduce((total, pack) => total + (identity.packs.includes(pack.id) ? pack.hits : 0), 0);
     return {id, ...identity, score:signalHits * 3 + packHits * 2};
   }).filter(identity => identity.score > 0).sort((a, b) => b.score - a.score);
-  return ranked[0] || {id:"general", label:"Upwards", references:[], accent:"classic", imageTarget:.52, score:0};
+  return ranked[0] || {id:"general", label:"Meanwhile", references:[], accent:"classic", imageTarget:.52, score:0};
 }
 function contextAllowed(item, identity) {
   const value = `${item.title || ""} ${item.summary || ""}`;
@@ -113,7 +106,7 @@ function isIdentityStory(item, identity) {
 async function enrichStoryImage(item) {
   if (item.image || !item.url || item.url === "#") return item;
   try {
-    const response = await fetch(item.url, {redirect:"follow", headers:{"User-Agent":"Mozilla/5.0 Upwards/5.0"}, signal:AbortSignal.timeout(2800)});
+    const response = await fetch(item.url, {redirect:"follow", headers:{"User-Agent":"Mozilla/5.0 BetterStart/5.0"}, signal:AbortSignal.timeout(2800)});
     if (!response.ok) return item;
     const html = await response.text();
     const image = html.match(/<meta[^>]+property=["']og:image(?::url)?["'][^>]+content=["']([^"']+)/i)?.[1]
@@ -169,7 +162,7 @@ const visualSearches = {
   sports:["sports photography", "baseball photography", "tennis photography", "running athletics photography"],
   business:["modern architecture photography", "craft workshop photography", "city design photography", "independent shop photography"],
   food:["food photography", "restaurant interior photography", "bakery photography", "market food photography"],
-  culture:["museum art photography", "theatre performance photography", "bookshop photography", "artist studio photography"],
+  culture:["museum architecture photography", "theatre stage photography", "bookshop photography", "artist studio workspace photography"],
   science:["astronomy photography", "microscopy photography", "natural history museum", "scientific instrument photography"],
   general:["art photography", "beautiful nature photography", "architecture photography", "human interest photography"]
 };
@@ -178,7 +171,7 @@ async function loadVisualShelf(identity, count = 80) {
   await Promise.all(searches.map(async search => {
     try {
       const params = new URLSearchParams({action:"query",generator:"search",gsrsearch:search,gsrnamespace:"6",gsrlimit:"30",prop:"imageinfo",iiprop:"url|mime|extmetadata",iiurlwidth:"1400",format:"json",origin:"*"});
-      const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {headers:{"User-Agent":"Upwards/10.0 (visual shelf; attributed Commons media)"}, signal:AbortSignal.timeout(5500)});
+      const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {headers:{"User-Agent":"BetterStart/10.0 (visual shelf; attributed Commons media)"}, signal:AbortSignal.timeout(5500)});
       if (!response.ok) return;
       const payload = await response.json();
       Object.values(payload?.query?.pages || {}).forEach(page => {
@@ -186,7 +179,8 @@ async function loadVisualShelf(identity, count = 80) {
         const title = plain(page.title?.replace(/^File:/i, "").replace(/\.[a-z0-9]+$/i, "").replace(/[_-]+/g, " "));
         const artist = plain(metadata.Artist?.value || metadata.Credit?.value || "Wikimedia Commons contributor").slice(0, 90);
         const license = plain(metadata.LicenseShortName?.value || metadata.UsageTerms?.value || "Open license").slice(0, 50);
-        if (!image || !/^image\/(jpeg|png|webp)$/i.test(info?.mime || "") || title.length < 5 || !isEnglishText(title) || isDisallowed({title})) return;
+        const safetyMetadata = `${title} ${plain(metadata.ImageDescription?.value || "")} ${plain(metadata.Categories?.value || "")} ${plain(metadata.DepictedPeople?.value || "")}`;
+        if (!image || !/^image\/(jpeg|png|webp)$/i.test(info?.mime || "") || title.length < 5 || isDisallowed({title:safetyMetadata})) return;
         results.push({title, url:`https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title.replace(/ /g, "_"))}`, summary:"", date:null, source:`${artist} · ${license}`, section:"VISUAL SHELF", image, score:95, interestHits:4, noHits:0, personalFit:"direct", format:"visual", sourcePack:"visual-shelf", sourcePackLabel:`${identity.label} visual shelf`, visualShelf:true});
       });
     } catch {}
@@ -195,12 +189,10 @@ async function loadVisualShelf(identity, count = 80) {
 }
 function isFreshLocal(item) {
   if (!item.date) return true;
-  // Specialist magazines are often valuable well beyond the daily-news cycle.
-  // Their evergreen craft, history and enthusiast pieces get a longer shelf.
-  if (item.sourcePack) return (Date.now() - new Date(item.date)) / 864e5 <= 400;
-  const evergreenSources = new Set(["NPR Music", "Criterion", "NYT Arts", "NYT Books", "Guardian Science", "Guardian Culture", "Dezeen", "Eater", "NASA"]);
-  if (evergreenSources.has(item.source)) return true;
-  return (Date.now() - new Date(item.date)) / 864e5 <= 45;
+  const age = (Date.now() - new Date(item.date)) / 864e5;
+  // If a publication has stopped producing fresh material, move laterally to
+  // another source in the category instead of recycling its archive forever.
+  return age <= (item.sourcePack ? 120 : 45);
 }
 function isGoodNews(item) {
   const value = `${item.title || ""} ${item.summary || ""}`;
@@ -272,11 +264,14 @@ function unique(items) {
 function compose(candidates, count, seed = {}, random = Math.random) {
   const chosen = [], sourceCounts = {...seed.sources}, topicCounts = {...seed.topics}, formatCounts = {...seed.formats}, geoCounts = {local:0,wanderlust:0}, wanderlustCap = Math.max(1, Math.floor(count * .2));
   const pool = [...candidates];
+  const sourceTotal = new Set(pool.map(item => item.source).filter(Boolean)).size;
+  const sourceLimit = sourceTotal > 1 ? Math.max(1, Math.ceil(count / sourceTotal) + (count > 20 ? 1 : 0)) : count;
   while (chosen.length < count && pool.length) {
     let winner = 0, best = -Infinity;
     pool.forEach((item, index) => {
       const recent = chosen.slice(-10);
-      const sourcePenalty = (sourceCounts[item.source] || 0) * 10 + (recent.some(previous => previous.source === item.source) ? 500 : 0);
+      const sourceAtLimit = (sourceCounts[item.source] || 0) >= sourceLimit && pool.some(other => other.source !== item.source && (sourceCounts[other.source] || 0) < sourceLimit);
+      const sourcePenalty = sourceAtLimit ? 10000 : (sourceCounts[item.source] || 0) * 35 + (recent.some(previous => previous.source === item.source) ? 500 : 0);
       const topicPenalty = (topicCounts[item.section] || 0) * 6 + (chosen.slice(-2).some(previous => previous.section === item.section) ? 30 : 0);
       const formatPenalty = (formatCounts[item.format] || 0) * 8;
       // Prefer stories that bring real photography, artwork or video texture.
@@ -296,7 +291,7 @@ function compose(candidates, count, seed = {}, random = Math.random) {
   }
   return chosen;
 }
-function seededRandom(value = "upwards") {
+function seededRandom(value = "meanwhile") {
   let state = 2166136261;
   for (let index = 0; index < value.length; index++) state = Math.imul(state ^ value.charCodeAt(index), 16777619);
   return () => { state += 0x6D2B79F5; let result = state; result = Math.imul(result ^ result >>> 15, result | 1); result ^= result + Math.imul(result ^ result >>> 7, result | 61); return ((result ^ result >>> 14) >>> 0) / 4294967296; };
@@ -313,7 +308,7 @@ function activateSourcePacks(interests, packs) {
 async function sharedVideoSources() {
   const fallback = load("video-sources.json"), url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL, token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
   if (!url || !token) return fallback;
-  try { const response = await fetch(url, {method:"POST", headers:{authorization:`Bearer ${token}`,"content-type":"application/json"}, body:JSON.stringify(["GET","upwards:sources"]), cache:"no-store"}); const value = (await response.json()).result; return value ? JSON.parse(value) : fallback; } catch { return fallback; }
+  try { const response = await fetch(url, {method:"POST", headers:{authorization:`Bearer ${token}`,"content-type":"application/json"}, body:JSON.stringify(["GET","betterstart:sources"]), cache:"no-store"}); const value = (await response.json()).result; return value ? JSON.parse(value) : fallback; } catch { return fallback; }
 }
 async function loadReaderVideos(avoid = new Set()) {
   const videoSources = await sharedVideoSources();
@@ -323,11 +318,11 @@ async function loadReaderVideos(avoid = new Set()) {
     return (feed.items || []).slice(0, 12).map(item => { const videoId = item.id?.split(":").pop() || item.link?.match(/[?&]v=([^&]+)/)?.[1]; return {title:plain(item.title),url:item.link,summary:"",date:item.isoDate||item.pubDate||null,source:source.name,section:source.category === "music" ? "MUSIC" : source.category === "art" ? "ART + DESIGN" : source.category === "animals" ? "ANIMALS + JOY" : "PEOPLE + JOY",image:videoId?`https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`:null,score:70,interestHits:3,noHits:0,videoId,format:"video"}; });
   }));
   const items=[]; results.forEach(result=>{if(result.status==="fulfilled")items.push(...result.value);});
-  return unique(items.filter(item=>item.videoId&&!avoid.has(item.videoId)&&isEnglishItem(item)&&!isDisallowed(item)));
+  return unique(items.filter(item=>item.videoId&&!avoid.has(item.videoId)&&!isDisallowed(item)));
 }
 
 export async function GET(request) {
-  const params = new URL(request.url).searchParams, random = seededRandom(params.get("visit") || String(Math.floor(Date.now() / 72e5))), avoidVideos = new Set((params.get("avoid") || "").split(",").filter(Boolean)), localPlaces = (params.get("places") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 20), interests = (params.get("interests") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 48);
+  const params = new URL(request.url).searchParams, random = seededRandom(params.get("visit") || String(Math.floor(Date.now() / 72e5))), avoidVideos = new Set((params.get("avoid") || "").split(",").filter(Boolean)), avoidStories = new Set((params.get("avoidStories") || "").split(",").filter(Boolean)), localPlaces = (params.get("places") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 20), interests = (params.get("interests") || "").split("|").map(value => value.trim().toLowerCase()).filter(Boolean).slice(0, 48);
   const taste = load("taste.json"), baseSources = load("sources.json"), activePacks = activateSourcePacks(interests, load("source-packs.json")), editorialIdentity = detectEditorialIdentity(interests, activePacks), specialistSources = activePacks.flatMap(pack => pack.sources.map(source => ({...source, pack:pack.id, packLabel:pack.label, packHits:pack.hits}))), sources = [...baseSources, ...specialistSources];
   const results = await Promise.allSettled(sources.map(async source => {
     const feed = await parser.parseURL(source.url);
@@ -339,7 +334,7 @@ export async function GET(request) {
   }));
   let all = [];
   results.forEach(result => { if (result.status === "fulfilled") all.push(...result.value); });
-  all = unique(all.filter(item => item.score > 18 && isEnglishItem(item) && !isDisallowed(item) && contextAllowed(item, editorialIdentity) && (isJoyful(item) || (item.sourcePack && isSpecialistWorthwhile(item))) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
+  all = unique(all.filter(item => item.score > 18 && !isDisallowed(item) && !wasRecentlyShown(item, avoidStories) && contextAllowed(item, editorialIdentity) && (isJoyful(item) || (item.sourcePack && isSpecialistWorthwhile(item))) && isFreshLocal(item)).map(item => personalize(item, interests)).sort((a, b) => b.score - a.score));
   all = await enrichIdentityImages(all, editorialIdentity);
 
   // One shared registry across every page region makes duplicates impossible.
@@ -354,7 +349,7 @@ export async function GET(request) {
   const ribbonFavorite = tickerStories[0] || null;
   const favoriteSelection = claim(compose(brightPool.filter(item => !usedUrls.has(canonicalUrl(item.url))), 6, {}, random));
   const goodNews = claim(compose(all.filter(isGoodNews), 1, {}, random))[0] || null;
-  const videoPool = (await loadReaderVideos(avoidVideos)).map(item => personalize(item, interests));
+  const videoPool = (await loadReaderVideos(avoidVideos)).filter(item => !wasRecentlyShown(item, avoidStories)).map(item => personalize(item, interests));
   const fashionFocus = editorialIdentity.id === "fashion";
   const focusMediaSignal = /fashion|runway|couture|designer|costume|wardrobe|atelier|supermodel|vogue|editorial photography|fashion photography|style archive|fashion week|women.?s tennis|wnba|author interview|novelist|book club/i;
   const relevantMedia = videoPool.filter(item => item.personalFit !== "editorial" && (!fashionFocus || focusMediaSignal.test(`${item.title} ${item.summary} ${item.section}`)));
@@ -368,6 +363,22 @@ export async function GET(request) {
     const backfillPool = all.filter(item => (!usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title))) && /SCIENCE|NATURE|TECH|PROGRESS|PEOPLE|ANIMALS|OUTDOOR/i.test(item.section || ""));
     important.push(...claim(compose(backfillPool, 3 - important.length, {}, random)));
   }
+  // Reserve a deep, fresh surprise shelf before the main gallery claims the
+  // remaining pool. This keeps serendipity available without weakening the
+  // page-wide URL/title dedupe or the cross-visit freshness rules.
+  const unusedStories = () => all.filter(item =>
+    !usedUrls.has(canonicalUrl(item.url)) &&
+    !usedTitles.has(normalizeTitle(item.title))
+  );
+  const serendipity = [];
+  const reserveSerendipity = pool => {
+    if (serendipity.length >= 60) return;
+    serendipity.push(...claim(compose(pool, 60 - serendipity.length, {}, random)));
+  };
+  reserveSerendipity(unusedStories().filter(item => item.noHits === 0 || item.personalFit === "editorial"));
+  reserveSerendipity(unusedStories().filter(item => item.personalFit === "adjacent"));
+  reserveSerendipity(unusedStories());
+
   const galleryPool = all.filter(item => !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
   let gallery;
   if (interests.length) {
@@ -401,13 +412,10 @@ export async function GET(request) {
   // If publishers still do not supply enough images, insert attributed,
   // openly licensed standalone photography. These are honest visual features,
   // never unrelated decorations attached to another story.
-  const allVisualShelf = await loadVisualShelf(editorialIdentity);
+  const allVisualShelf = (await loadVisualShelf(editorialIdentity)).filter(item => !wasRecentlyShown(item, avoidStories));
   const visualShelf = claim(allVisualShelf.slice(0, 56));
   gallery = distributeVisuals([...gallery, ...visualShelf], editorialIdentity).slice(0, 140);
   const galleryKeys = new Set(gallery.map(item => canonicalUrl(item.url)));
   const visualReserve = allVisualShelf.slice(56).filter(item => !galleryKeys.has(canonicalUrl(item.url))).slice(0, 24).map(item => ({...item, canonicalUrl:canonicalUrl(item.url)}));
-  const serendipityPool = all.filter(item => item.noHits === 0 && !usedUrls.has(canonicalUrl(item.url)) && !usedTitles.has(normalizeTitle(item.title)));
-  const serendipity = claim(compose(serendipityPool, 60, {}, random));
-
   return Response.json({generatedAt: new Date().toISOString(), edition: Math.floor(Date.now() / 72e5), personalized:!!interests.length, editorialIdentity:{id:editorialIdentity.id,label:editorialIdentity.label,accent:editorialIdentity.accent,references:editorialIdentity.references,imageTarget:editorialIdentity.imageTarget}, composition:fashionFocus?{direct:80,adjacent:12,editorial:8}:{direct:65,adjacent:20,editorial:15}, activeSourcePacks:activePacks.map(pack => ({id:pack.id,label:pack.label,hits:pack.hits})), tickerStories, ribbonFavorite, goodNews, favorites: favoriteSelection, media, gallery, visualReserve, important, serendipity, sourceStatus: {total: sources.length, specialist:specialistSources.length, successful: results.filter(result => result.status === "fulfilled").length}}, {headers: {"Cache-Control": "no-store"}});
 }
